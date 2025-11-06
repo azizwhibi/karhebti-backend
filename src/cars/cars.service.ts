@@ -29,8 +29,10 @@ export class CarsService {
       throw new NotFoundException('Voiture non trouvée');
     }
 
+    // Convertir les deux IDs en string pour la comparaison
+    const carUserId = (car.user as any)._id?.toString() || car.user.toString();
     // Vérifier que l'utilisateur a accès à cette voiture
-    if (userRole !== 'admin' && car.user.toString() !== userId) {
+    if (userRole !== 'admin' && carUserId !== userId) {
       throw new ForbiddenException('Accès non autorisé à cette voiture');
     }
 
@@ -43,7 +45,9 @@ export class CarsService {
       throw new NotFoundException('Voiture non trouvée');
     }
 
-    if (userRole !== 'admin' && car.user.toString() !== userId) {
+    // Convertir les deux IDs en string pour la comparaison
+    const carUserId = (car.user as any)._id?.toString() || car.user.toString();
+    if (userRole !== 'admin' && carUserId !== userId) {
       throw new ForbiddenException('Vous ne pouvez modifier que vos propres voitures');
     }
 
@@ -65,7 +69,9 @@ export class CarsService {
       throw new NotFoundException('Voiture non trouvée');
     }
 
-    if (userRole !== 'admin' && car.user.toString() !== userId) {
+    // Convertir les deux IDs en string pour la comparaison
+    const carUserId = (car.user as any)._id?.toString() || car.user.toString();
+    if (userRole !== 'admin' && carUserId !== userId) {
       throw new ForbiddenException('Vous ne pouvez supprimer que vos propres voitures');
     }
 

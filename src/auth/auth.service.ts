@@ -111,7 +111,7 @@ export class AuthService {
       return null;
     }
     return {
-      userId: user._id,
+      userId: (user._id as any).toString(),
       email: user.email,
       role: user.role,
     };
