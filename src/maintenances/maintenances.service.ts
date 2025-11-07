@@ -1,6 +1,6 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException, BadRequestException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { Maintenance, MaintenanceDocument } from './schemas/maintenance.schema';
 import { CreateMaintenanceDto } from './dto/create-maintenance.dto';
 import { UpdateMaintenanceDto } from './dto/update-maintenance.dto';
@@ -34,20 +34,39 @@ export class MaintenancesService {
   }
 
   async findOne(id: string, userId: string, userRole: string): Promise<Maintenance> {
-    const maintenance = await this.maintenanceModel.findById(id).populate('garage voiture').exec();
+    // Valider l'ID MongoDB
+    if (!Types.ObjectId.isValid(id)) {
+      throw new BadRequestException('ID d\'entretien invalide');
+    }
+
+    const maintenance = await this.maintenanceModel.findById(id).exec();
     if (!maintenance) {
       throw new NotFoundException('Entretien non trouvé');
     }
 
     if (userRole !== 'admin') {
-      const car = await this.carsService.findOne(maintenance.voiture.toString(), userId, userRole);
+      // Vérifier que la voiture appartient à l'utilisateur avant de peupler
+      await this.carsService.findOne(maintenance.voiture.toString(), userId, userRole);
+    }
+
+    // Peupler après la vérification des permissions
+    try {
+      await maintenance.populate('garage voiture');
+    } catch (error) {
+      // Si le peuplement échoue (garage ou voiture introuvable), retourner sans peupler
+      console.error('Erreur lors du peuplement:', error);
     }
 
     return maintenance;
   }
 
   async update(id: string, updateMaintenanceDto: UpdateMaintenanceDto, userId: string, userRole: string): Promise<Maintenance> {
-    const maintenance = await this.maintenanceModel.findById(id);
+    // Valider l'ID MongoDB
+    if (!Types.ObjectId.isValid(id)) {
+      throw new BadRequestException('ID d\'entretien invalide');
+    }
+
+    const maintenance = await this.maintenanceModel.findById(id).exec();
     if (!maintenance) {
       throw new NotFoundException('Entretien non trouvé');
     }
@@ -58,17 +77,28 @@ export class MaintenancesService {
 
     const updatedMaintenance = await this.maintenanceModel
       .findByIdAndUpdate(id, updateMaintenanceDto, { new: true })
-      .populate('garage voiture')
       .exec();
 
     if (!updatedMaintenance) {
       throw new NotFoundException('Entretien non trouvé');
     }
 
+    // Peupler après la mise à jour
+    try {
+      await updatedMaintenance.populate('garage voiture');
+    } catch (error) {
+      console.error('Erreur lors du peuplement:', error);
+    }
+
     return updatedMaintenance;
   }
 
   async remove(id: string, userId: string, userRole: string): Promise<void> {
+    // Valider l'ID MongoDB
+    if (!Types.ObjectId.isValid(id)) {
+      throw new BadRequestException('ID d\'entretien invalide');
+    }
+
     const maintenance = await this.maintenanceModel.findById(id);
     if (!maintenance) {
       throw new NotFoundException('Entretien non trouvé');
