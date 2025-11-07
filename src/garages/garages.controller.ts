@@ -15,7 +15,7 @@ export class GaragesController {
   constructor(private readonly service: GaragesService) {}
 
   @Post()
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.propGarage)
   create(@Body() createDto: CreateGarageDto) {
     return this.service.create(createDto);
   }

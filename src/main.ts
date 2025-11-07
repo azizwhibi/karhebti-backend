@@ -15,11 +15,8 @@ async function bootstrap() {
     }),
   );
 
-  // Configuration CORS
-  app.enableCors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:3001',
-    credentials: true,
-  });
+  // Configuration CORS - Allow all origins for development
+  app.enableCors();
 
   // Configuration Swagger
   const config = new DocumentBuilder()
@@ -44,9 +41,13 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, document);
 
   const port = process.env.PORT || 3000;
-  await app.listen(port);
+  await app.listen(port, '0.0.0.0');
 
-  console.log(`\n🚀 Application démarrée sur http://localhost:${port}`);
-  console.log(`📚 Documentation Swagger: http://localhost:${port}/api\n`);
+  console.log(`\n🚀 Application démarrée et accessible sur:`);
+  console.log(`   - http://localhost:${port}`);
+  console.log(`   - http://192.168.1.190:${port}`);
+  console.log(`📚 Documentation Swagger:`);
+  console.log(`   - http://localhost:${port}/api`);
+  console.log(`   - http://192.168.1.190:${port}/api\n`);
 }
 bootstrap();
