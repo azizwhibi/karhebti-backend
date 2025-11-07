@@ -7,6 +7,7 @@ export type CarDocument = Car & Document;
 export class Car {
   @Prop({ required: true })
   marque: string;
+  //
 
   @Prop({ required: true })
   modele: string;
