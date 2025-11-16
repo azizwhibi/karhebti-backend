@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { AppController } from './app.controller';
@@ -14,9 +15,16 @@ import { DeadlinesModule } from './deadlines/deadlines.module';
 import { GaragesModule } from './garages/garages.module';
 import { ServicesModule } from './services/services.module';
 import { AiModule } from './ai/ai.module';
+import { TranslationModule } from './translation/translation.module';
 
 @Module({
   imports: [
+    // Configuration des variables d'environnement
+    ConfigModule.forRoot({
+      isGlobal: true, // Rend les variables d'environnement accessibles partout
+      envFilePath: '.env',
+    }),
+    
     // Configuration MongoDB
     MongooseModule.forRoot(
       process.env.MONGODB_URI || 'mongodb://localhost:27017/karhebti',
@@ -40,6 +48,7 @@ import { AiModule } from './ai/ai.module';
     GaragesModule,
     ServicesModule,
     AiModule,
+    TranslationModule,
   ],
   controllers: [AppController],
   providers: [AppService],

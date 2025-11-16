@@ -4,10 +4,14 @@ import { Model, Types } from 'mongoose';
 import { Car, CarDocument } from './schemas/car.schema';
 import { CreateCarDto } from './dto/create-car.dto';
 import { UpdateCarDto } from './dto/update-car.dto';
+import { UploadService } from '../common/services/upload.service';
 
 @Injectable()
 export class CarsService {
-  constructor(@InjectModel(Car.name) private carModel: Model<CarDocument>) {}
+  constructor(
+    @InjectModel(Car.name) private carModel: Model<CarDocument>,
+    private uploadService: UploadService,
+  ) {}
 
   async create(createCarDto: CreateCarDto, userId: string): Promise<Car> {
     const createdCar = new this.carModel({
@@ -80,5 +84,38 @@ export class CarsService {
 
   async findByUser(userId: string): Promise<Car[]> {
     return this.carModel.find({ user: userId }).exec();
+  }
+
+  async uploadImage(
+    carId: string,
+    file: Express.Multer.File,
+    userId: string,
+    userRole: string,
+  ): Promise<Car> {
+    const car = await this.carModel.findById(carId);
+    if (!car) {
+      throw new NotFoundException('Voiture non trouvée');
+    }
+
+    // Check ownership
+    const carUserId = (car.user as any)._id?.toString() || car.user.toString();
+    if (userRole !== 'admin' && carUserId !== userId) {
+      throw new ForbiddenException('Vous ne pouvez modifier que vos propres voitures');
+    }
+
+    // Delete old image if exists
+    if (car.imageUrl) {
+      await this.uploadService.deleteCarImage(car.imageUrl);
+    }
+
+    // Process and upload new image
+    const processedImage = await this.uploadService.processCarImage(file, carId);
+
+    // Update car with new image data
+    car.imageUrl = processedImage.url;
+    car.imageMeta = processedImage.metadata;
+    await car.save();
+
+    return car;
   }
 }

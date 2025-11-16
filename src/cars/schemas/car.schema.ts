@@ -22,6 +22,25 @@ export class Car {
 
   @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'User', required: true })
   user: MongooseSchema.Types.ObjectId;
+
+  @Prop()
+  imageUrl?: string;
+
+  @Prop({
+    type: {
+      width: { type: Number },
+      height: { type: Number },
+      format: { type: String },
+      size: { type: Number },
+    },
+    _id: false,
+  })
+  imageMeta?: {
+    width: number;
+    height: number;
+    format: string;
+    size: number;
+  };
 }
 
 export const CarSchema = SchemaFactory.createForClass(Car);

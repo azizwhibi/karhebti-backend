@@ -22,6 +22,23 @@ export class User {
 
   @Prop({ required: true, enum: ['admin', 'utilisateur'], default: 'utilisateur' })
   role: string;
+
+  @Prop({ default: false })
+  emailVerified: boolean;
+
+  @Prop({
+    type: {
+      codeHash: { type: String },
+      expiresAt: { type: Date },
+      attempts: { type: Number, default: 0 },
+    },
+    _id: false,
+  })
+  emailVerification?: {
+    codeHash: string;
+    expiresAt: Date;
+    attempts: number;
+  };
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
