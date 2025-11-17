@@ -105,4 +105,26 @@ export class CarsController {
     return this.carsService.remove(id, user.userId, user.role);
   }
 
+  // Marketplace endpoints
+  @Get('marketplace/available')
+  @ApiOperation({ summary: 'Get available cars for swiping (marketplace)' })
+  @ApiResponse({ status: 200, description: 'List of available cars for sale' })
+  getAvailableCars(@CurrentUser() user: any) {
+    return this.carsService.getAvailableCarsForSwipe(user.userId);
+  }
+
+  @Post(':id/list-for-sale')
+  @ApiOperation({ summary: 'List a car for sale on marketplace' })
+  @ApiResponse({ status: 200, description: 'Car listed for sale' })
+  listForSale(@Param('id') id: string, @CurrentUser() user: any) {
+    return this.carsService.listCarForSale(id, user.userId);
+  }
+
+  @Post(':id/unlist')
+  @ApiOperation({ summary: 'Remove car from marketplace' })
+  @ApiResponse({ status: 200, description: 'Car removed from marketplace' })
+  unlistCar(@Param('id') id: string, @CurrentUser() user: any) {
+    return this.carsService.unlistCar(id, user.userId);
+  }
+
 }

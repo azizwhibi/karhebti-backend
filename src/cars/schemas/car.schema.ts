@@ -41,6 +41,22 @@ export class Car {
     format: string;
     size: number;
   };
+
+  // Marketplace fields
+  @Prop({ default: false })
+  forSale: boolean;
+
+  @Prop({ enum: ['available', 'sold', 'not-listed'], default: 'not-listed' })
+  saleStatus: string;
+
+  @Prop()
+  price?: number;
+
+  @Prop()
+  description?: string;
+
+  @Prop({ type: [String], default: [] })
+  images?: string[];
 }
 
 export const CarSchema = SchemaFactory.createForClass(Car);

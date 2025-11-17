@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
@@ -16,6 +17,10 @@ import { GaragesModule } from './garages/garages.module';
 import { ServicesModule } from './services/services.module';
 import { AiModule } from './ai/ai.module';
 import { TranslationModule } from './translation/translation.module';
+import { SwipesModule } from './swipes/swipes.module';
+import { ConversationsModule } from './conversations/conversations.module';
+import { NotificationsModule } from './notifications/notifications.module';
+import { ChatModule } from './chat/chat.module';
 
 @Module({
   imports: [
@@ -36,6 +41,9 @@ import { TranslationModule } from './translation/translation.module';
       limit: 100,
     }]),
 
+    // Event Emitter for real-time notifications
+    EventEmitterModule.forRoot(),
+
     // Modules métier
     AuthModule,
     UsersModule,
@@ -49,6 +57,12 @@ import { TranslationModule } from './translation/translation.module';
     ServicesModule,
     AiModule,
     TranslationModule,
+    
+    // Marketplace modules
+    SwipesModule,
+    ConversationsModule,
+    NotificationsModule,
+    ChatModule,
   ],
   controllers: [AppController],
   providers: [AppService],

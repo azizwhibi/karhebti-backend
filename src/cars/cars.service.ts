@@ -1,15 +1,17 @@
 import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
+import { Model } from 'mongoose';
 import { Car, CarDocument } from './schemas/car.schema';
 import { CreateCarDto } from './dto/create-car.dto';
 import { UpdateCarDto } from './dto/update-car.dto';
 import { UploadService } from '../common/services/upload.service';
+import { Swipe, SwipeDocument } from '../swipes/schemas/swipe.schema';
 
 @Injectable()
 export class CarsService {
   constructor(
     @InjectModel(Car.name) private carModel: Model<CarDocument>,
+    @InjectModel(Swipe.name) private swipeModel: Model<SwipeDocument>,
     private uploadService: UploadService,
   ) {}
 
@@ -114,6 +116,60 @@ export class CarsService {
     // Update car with new image data
     car.imageUrl = processedImage.url;
     car.imageMeta = processedImage.metadata;
+    await car.save();
+
+    return car;
+  }
+
+  // Marketplace methods
+  async getAvailableCarsForSwipe(userId: string): Promise<Car[]> {
+    // Get IDs of cars already swiped by user
+    const swipedCars = await this.swipeModel.find({ userId }).distinct('carId');
+
+    return this.carModel
+      .find({
+        forSale: true,
+        saleStatus: 'available',
+        user: { $ne: userId },
+        _id: { $nin: swipedCars },
+      })
+      .populate('user', 'nom prenom email')
+      .exec();
+  }
+
+  async listCarForSale(carId: string, userId: string): Promise<Car> {
+    const car = await this.carModel.findById(carId);
+    if (!car) {
+      throw new NotFoundException('Car not found');
+    }
+
+    // Check ownership
+    const carUserId = (car.user as any)._id?.toString() || car.user.toString();
+    if (carUserId !== userId) {
+      throw new ForbiddenException('You can only list your own cars for sale');
+    }
+
+    car.forSale = true;
+    car.saleStatus = 'available';
+    await car.save();
+
+    return car;
+  }
+
+  async unlistCar(carId: string, userId: string): Promise<Car> {
+    const car = await this.carModel.findById(carId);
+    if (!car) {
+      throw new NotFoundException('Car not found');
+    }
+
+    // Check ownership
+    const carUserId = (car.user as any)._id?.toString() || car.user.toString();
+    if (carUserId !== userId) {
+      throw new ForbiddenException('You can only unlist your own cars');
+    }
+
+    car.forSale = false;
+    car.saleStatus = 'not-listed';
     await car.save();
 
     return car;
