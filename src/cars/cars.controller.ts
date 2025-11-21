@@ -21,6 +21,7 @@ import { UpdateCarDto } from './dto/update-car.dto';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
+import { ImageValidationService } from '../ai/image-validation.service';
 
 
 @ApiTags('Cars')
@@ -28,7 +29,10 @@ import { CurrentUser } from '../common/decorators/current-user.decorator';
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('cars')
 export class CarsController {
-  constructor(private readonly carsService: CarsService) {}
+  constructor(
+    private readonly carsService: CarsService,
+    private readonly imageValidationService: ImageValidationService,
+  ) {}
 
   @Post(':id/image')
   @ApiOperation({ summary: 'Upload car image' })
@@ -57,6 +61,10 @@ export class CarsController {
     ) file: Express.Multer.File,
     @CurrentUser() user: any
   ) {
+    // Validate that the image contains a car using Gemini AI
+    await this.imageValidationService.validateCarImageOrThrow(file);
+    
+    // If validation passes, proceed with upload
     return this.carsService.uploadImage(id, file, user.userId, user.role);
   }
 
