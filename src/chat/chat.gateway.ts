@@ -39,6 +39,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       const token = client.handshake.auth?.token || client.handshake.headers?.authorization?.split(' ')[1];
       
       if (!token) {
+        this.logger.warn(`⚠️ Connection rejected: No token provided`);
         client.disconnect();
         return;
       }
@@ -51,12 +52,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       this.userSockets.set(userId, client.id);
       client.data.userId = userId;
 
-      this.logger.log(`Client connected: ${client.id}, User: ${userId}`);
+      this.logger.log(`✅ Client connected: ${client.id}, User: ${userId}`);
       
       // Notify user is online
       client.broadcast.emit('user_online', { userId });
     } catch (error) {
-      this.logger.error('Connection error:', error.message);
+      this.logger.error(`❌ Connection error: ${error.message}`);
       client.disconnect();
     }
   }
@@ -65,9 +66,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const userId = client.data.userId;
     if (userId) {
       this.userSockets.delete(userId);
+      this.logger.log(`⚠️ Client disconnected: ${client.id}, User: ${userId}`);
       client.broadcast.emit('user_offline', { userId });
+    } else {
+      this.logger.log(`⚠️ Client disconnected: ${client.id}`);
     }
-    this.logger.log(`Client disconnected: ${client.id}`);
   }
 
   @SubscribeMessage('join_conversation')
@@ -99,7 +102,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       const roomName = `convo_${conversationId}`;
       client.join(roomName);
       
-      this.logger.log(`User ${userId} joined conversation ${conversationId}`);
+      this.logger.log(`✅ User ${userId} joined conversation ${conversationId}`);
       client.emit('joined_conversation', { conversationId });
     } catch (error) {
       this.logger.error('Error joining conversation:', error.message);
@@ -135,7 +138,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
       // Emit to all users in the conversation room
       const roomName = `convo_${conversationId}`;
-      this.server.to(roomName).emit('new_message', {
+      
+      this.logger.log(`📨 Message sent via WebSocket`);
+      this.logger.log(`📨 Emitting new_message to room ${roomName}`);
+      
+      const messageData = {
         conversationId,
         message: {
           _id: message._id,
@@ -144,7 +151,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
           createdAt: message.createdAt,
           isRead: message.isRead,
         },
-      });
+      };
+      
+      // Emit to conversation room (includes sender for echo)
+      this.server.to(roomName).emit('new_message', messageData);
+      
+      this.logger.log(`✅ new_message emitted to room ${roomName}`);
 
       // Send notification to the other user
       const otherUserId = conversation.buyerId.toString() === userId 
@@ -158,6 +170,16 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         message: `You have a new message`,
         data: {
           conversationId,
+          messageId: message._id,
+          // Include full message for Android fallback (if new_message event doesn't reach)
+          message: {
+            _id: message._id,
+            conversationId,
+            senderId: userId,
+            content: message.content,
+            isRead: message.isRead,
+            createdAt: message.createdAt,
+          },
         },
         fromUserId: userId,
       });
@@ -175,10 +197,28 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     otherUserId: string;
   }) {
     const roomName = `convo_${payload.conversationId}`;
+    
+    this.logger.log(`📨 Message created via REST API`);
+    this.logger.log(`📨 Message ID: ${payload.message._id}`);
+    this.logger.log(`📨 Conversation ID: ${payload.conversationId}`);
+    this.logger.log(`📨 Emitting new_message to room ${roomName}`);
+    
+    // Emit to room
     this.server.to(roomName).emit('new_message', {
       conversationId: payload.conversationId,
       message: payload.message,
     });
+
+    this.logger.log(`✅ new_message emitted to conversation room`);
+    
+    // Check if recipient is connected
+    const recipientSocketId = this.userSockets.get(payload.otherUserId);
+    if (!recipientSocketId) {
+      this.logger.warn(`⚠️ Recipient user ${payload.otherUserId} is NOT connected via WebSocket`);
+      this.logger.warn(`⚠️ Message will only be delivered via notification/API`);
+    } else {
+      this.logger.log(`✅ Recipient user ${payload.otherUserId} is connected (socket: ${recipientSocketId})`);
+    }
 
     // Notify the other participant
     await this.notificationsService.createNotification({
@@ -186,9 +226,16 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       type: 'new_message',
       title: 'New Message',
       message: `You have a new message`,
-      data: { conversationId: payload.conversationId },
+      data: { 
+        conversationId: payload.conversationId,
+        messageId: payload.message._id,
+        // Include full message for Android fallback
+        message: payload.message,
+      },
       fromUserId: payload.message.senderId,
     });
+    
+    this.logger.log(`✅ Notification emitted to user ${payload.otherUserId}`);
   }
 
   @SubscribeMessage('typing')
