@@ -22,6 +22,9 @@ export class User {
 
   @Prop({ required: true, enum: ['admin', 'utilisateur'], default: 'utilisateur' })
   role: string;
+
+  @Prop()
+  deviceToken?: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

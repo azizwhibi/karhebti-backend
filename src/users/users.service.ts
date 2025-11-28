@@ -74,4 +74,20 @@ export class UsersService {
     }
     return updatedUser;
   }
+
+  async updateDeviceToken(userId: string, deviceToken: string): Promise<User> {
+    const updatedUser = await this.userModel
+      .findByIdAndUpdate(
+        userId,
+        { deviceToken },
+        { new: true },
+      )
+      .select('-motDePasse')
+      .exec();
+
+    if (!updatedUser) {
+      throw new NotFoundException('Utilisateur non trouvé');
+    }
+    return updatedUser;
+  }
 }

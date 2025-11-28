@@ -1,10 +1,17 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import { join } from 'path';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+
+  // Servir les fichiers statiques (uploads)
+  app.useStaticAssets(join(__dirname, '..', 'uploads'), {
+    prefix: '/uploads/',
+  });
 
   // Validation globale des DTOs
   app.useGlobalPipes(
@@ -41,13 +48,22 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, document);
 
   const port = process.env.PORT || 3000;
-  await app.listen(port, '0.0.0.0');
+  
+  try {
+    await app.listen(port, '0.0.0.0');
 
-  console.log(`\n🚀 Application démarrée et accessible sur:`);
-  console.log(`   - http://localhost:${port}`);
-  console.log(`   - http://192.168.1.190:${port}`);
-  console.log(`📚 Documentation Swagger:`);
-  console.log(`   - http://localhost:${port}/api`);
-  console.log(`   - http://192.168.1.190:${port}/api\n`);
+    console.log(`\n🚀 Application démarrée et accessible sur:`);
+    console.log(`   - http://localhost:${port}`);
+    console.log(`   - http://192.168.1.190:${port}`);
+    console.log(`📚 Documentation Swagger:`);
+    console.log(`   - http://localhost:${port}/api`);
+    console.log(`   - http://192.168.1.190:${port}/api\n`);
+  } catch (error) {
+    console.error('❌ Erreur au démarrage du serveur:', error);
+    process.exit(1);
+  }
 }
-bootstrap();
+bootstrap().catch((error) => {
+  console.error('❌ Erreur fatale:', error);
+  process.exit(1);
+});
