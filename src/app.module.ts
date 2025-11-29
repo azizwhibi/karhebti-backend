@@ -14,6 +14,9 @@ import { DeadlinesModule } from './deadlines/deadlines.module';
 import { GaragesModule } from './garages/garages.module';
 import { ServicesModule } from './services/services.module';
 import { AiModule } from './ai/ai.module';
+import { ReservationsModule } from './reservation/reservations.module';
+import { RepairBaysModule } from './repair-bays/repair-bays.module';
+
 
 @Module({
   imports: [
@@ -40,6 +43,8 @@ import { AiModule } from './ai/ai.module';
     GaragesModule,
     ServicesModule,
     AiModule,
+    ReservationsModule,
+    RepairBaysModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -14,5 +14,6 @@ import { Garage, GarageSchema } from '../garages/schemas/garage.schema';
   ],
   controllers: [ServicesController],
   providers: [ServicesService],
+  exports: [ServicesService],
 })
 export class ServicesModule {}

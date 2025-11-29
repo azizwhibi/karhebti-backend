@@ -21,11 +21,11 @@ export class SignupDto {
   @IsString()
   prenom: string;
 
-  @ApiProperty({ example: 'jean.dupont@example.com' })
+  @ApiProperty({ example: 'rayen@esprit.tn' })
   @IsEmail()
   email: string;
 
-  @ApiProperty({ example: 'Password123!', minLength: 6 })
+  @ApiProperty({ example: 'rayen123', minLength: 6 })
   @IsString()
   @MinLength(6)
   motDePasse: string;
@@ -36,7 +36,7 @@ export class SignupDto {
 }
 
 export class ForgotPasswordDto {
-  @ApiProperty({ example: 'jean.dupont@example.com' })
+  @ApiProperty({ example: 'rayen@esprit.tn' })
   @IsEmail()
   email: string;
 }
