@@ -5,6 +5,7 @@ import { Model } from 'mongoose';
 import * as bcrypt from 'bcrypt';
 import * as argon2 from 'argon2';
 import * as crypto from 'crypto';
+import * as admin from 'firebase-admin';
 import { User, UserDocument } from '../users/schemas/user.schema';
 import { Otp, OtpDocument } from './schemas/otp.schema';
 import { PendingSignup, PendingSignupDocument } from './schemas/pending-signup.schema';

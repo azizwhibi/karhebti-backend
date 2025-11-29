@@ -1,8 +1,10 @@
-import { Injectable, ExecutionContext, UnauthorizedException } from '@nestjs/common';
+import { Injectable, ExecutionContext, UnauthorizedException, Logger } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
+  private readonly logger = new Logger(JwtAuthGuard.name);
+
   canActivate(context: ExecutionContext) {
     const request = context.switchToHttp().getRequest();
     console.log('=== JWT AUTH GUARD ===');
@@ -21,6 +23,9 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
       console.error('❌ No Authorization header found');
     }
     
+    this.logger.log(`JWT Guard invoked for route: ${context.getClass().name}`);
+    const authHeader = request.headers.authorization;
+    this.logger.log(`Authorization header: ${authHeader?.substring(0, 20)}...`);
     return super.canActivate(context);
   }
 
@@ -29,6 +34,8 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     console.log('❓ Error:', err ? err.message : 'NONE');
     console.log('👤 User:', user ? 'FOUND' : 'NOT FOUND');
     console.log('ℹ️ Info:', info ? info.message || info : 'NONE');
+    
+    this.logger.log(`JWT Guard handleRequest - Error: ${err}, User: ${JSON.stringify(user)}, Info: ${info}`);
     
     if (err) {
       console.error('❌ Error object:', JSON.stringify(err, null, 2));
@@ -39,6 +46,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
       if (info) {
         console.error('📋 Additional info:', info);
       }
+      this.logger.error(`JWT validation failed: ${err?.message || info}`);
       throw err || new UnauthorizedException('Authentication failed');
     }
     

@@ -15,7 +15,7 @@ export class GaragesController {
   constructor(private readonly service: GaragesService) {}
 
   @Post()
-  @Roles(UserRole.propGarage)
+  @Roles(UserRole.ADMIN, UserRole.propGarage)
   create(@Body() createDto: CreateGarageDto) {
     return this.service.create(createDto);
   }
@@ -31,7 +31,7 @@ export class GaragesController {
   }
 
   @Patch(':id')
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.ADMIN, UserRole.propGarage)
   update(@Param('id') id: string, @Body() updateDto: UpdateGarageDto) {
     return this.service.update(id, updateDto);
   }

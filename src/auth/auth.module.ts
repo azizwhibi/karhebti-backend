@@ -10,6 +10,7 @@ import { User, UserSchema } from '../users/schemas/user.schema';
 import { Otp, OtpSchema } from './schemas/otp.schema';
 import { PendingSignup, PendingSignupSchema } from './schemas/pending-signup.schema';
 import { EmailService } from '../common/services/email.service';
+import { FirebaseModule } from '../firebase/firebase.module';
 
 @Module({
   imports: [
@@ -20,7 +21,7 @@ import { EmailService } from '../common/services/email.service';
     ]),
     PassportModule,
     JwtModule.register({
-      secret: process.env.JWT_SECRET || 'your-secret-key-change-in-production',
+      secret: process.env.JWT_SECRET || 'karhebti-jwt-super-secret-key-2024',
       signOptions: { expiresIn: '24h' },
     }),
     ThrottlerModule.forRoot([
@@ -29,9 +30,10 @@ import { EmailService } from '../common/services/email.service';
         limit: 5, // 5 requests per hour for OTP/email
       },
     ]),
+    FirebaseModule,
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy, EmailService],
-  exports: [AuthService],
+  exports: [AuthService, JwtModule],
 })
 export class AuthModule {}

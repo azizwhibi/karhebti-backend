@@ -39,6 +39,9 @@ export class User {
     expiresAt: Date;
     attempts: number;
   };
+
+  @Prop()
+  deviceToken?: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

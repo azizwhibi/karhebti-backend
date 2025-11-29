@@ -1,10 +1,12 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, Logger } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { AuthService } from './auth.service';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
+  private readonly logger = new Logger(JwtStrategy.name);
+
   constructor(private authService: AuthService) {
     const secret = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
     console.log('🔐 JwtStrategy initialized');
@@ -15,6 +17,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       ignoreExpiration: false,
       secretOrKey: secret,
     });
+    this.logger.log(`JWT Secret configured: ${this.getSecretKey()?.substring(0, 10)}...`);
+  }
+
+  private getSecretKey() {
+    return process.env.JWT_SECRET || 'karhebti-jwt-super-secret-key-2024';
   }
 
   async validate(payload: any) {

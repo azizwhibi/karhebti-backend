@@ -12,15 +12,17 @@ import { MaintenancesModule } from './maintenances/maintenances.module';
 import { PartsModule } from './parts/parts.module';
 import { ReplacementHistoryModule } from './replacement-history/replacement-history.module';
 import { DocumentsModule } from './documents/documents.module';
-import { DeadlinesModule } from './deadlines/deadlines.module';
 import { GaragesModule } from './garages/garages.module';
 import { ServicesModule } from './services/services.module';
+import { ReclamationsModule } from './reclamations/reclamations.module';
 import { AiModule } from './ai/ai.module';
 import { TranslationModule } from './translation/translation.module';
 import { SwipesModule } from './swipes/swipes.module';
 import { ConversationsModule } from './conversations/conversations.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { ChatModule } from './chat/chat.module';
+import { BreakdownsModule } from './breakdowns/breakdowns.module';
+import { FirebaseModule } from './firebase/firebase.module';
 
 @Module({
   imports: [
@@ -29,7 +31,6 @@ import { ChatModule } from './chat/chat.module';
       isGlobal: true, // Rend les variables d'environnement accessibles partout
       envFilePath: '.env',
     }),
-    
     // Configuration MongoDB
     MongooseModule.forRoot(
       process.env.MONGODB_URI || 'mongodb://localhost:27017/karhebti',
@@ -44,6 +45,9 @@ import { ChatModule } from './chat/chat.module';
     // Event Emitter for real-time notifications
     EventEmitterModule.forRoot(),
 
+    // Firebase Configuration
+    FirebaseModule,
+
     // Modules métier
     AuthModule,
     UsersModule,
@@ -52,16 +56,17 @@ import { ChatModule } from './chat/chat.module';
     PartsModule,
     ReplacementHistoryModule,
     DocumentsModule,
-    DeadlinesModule,
     GaragesModule,
     ServicesModule,
+    ReclamationsModule,
+    NotificationsModule,
     AiModule,
     TranslationModule,
+    BreakdownsModule,
     
     // Marketplace modules
     SwipesModule,
     ConversationsModule,
-    NotificationsModule,
     ChatModule,
   ],
   controllers: [AppController],
