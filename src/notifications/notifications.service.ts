@@ -24,18 +24,11 @@ export class NotificationsService {
 
   private initializeServices() {
     try {
-      const app = initializeFirebase();
-      if (app) {
-        this.firebaseMessaging = getFirebaseMessaging();
-        if (this.firebaseMessaging) {
-          this.logger.log('✅ Firebase Cloud Messaging initialisé avec succès');
-        }
-      } else {
-        this.logger.debug('ℹ️  Firebase non configuré (optionnel)');
-      }
+      initializeFirebase();
+      this.firebaseMessaging = getFirebaseMessaging();
+      this.logger.log('✅ Firebase initialisé avec succès');
     } catch (error) {
-      // Firebase is optional, so we just log and continue
-      this.logger.debug(`ℹ️  Firebase non disponible: ${error.message}`);
+      this.logger.warn('⚠️  Firebase non disponible:', error);
     }
   }
 
@@ -49,8 +42,7 @@ export class NotificationsService {
     data?: Record<string, any>,
   ): Promise<string> {
     if (!this.firebaseMessaging) {
-      this.logger.warn('Firebase Cloud Messaging non configuré - notification non envoyée');
-      throw new Error('Firebase Cloud Messaging non disponible. Configurez FIREBASE_KEY_PATH dans .env');
+      throw new Error('Firebase Cloud Messaging non disponible');
     }
 
     try {

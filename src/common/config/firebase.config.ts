@@ -12,8 +12,8 @@ export const initializeFirebase = () => {
   const firebaseKeyPath = process.env.FIREBASE_KEY_PATH;
 
   if (!firebaseKeyPath) {
-    console.debug(
-      'ℹ️  FIREBASE_KEY_PATH non défini. Firebase Cloud Messaging ne sera pas disponible.',
+    console.warn(
+      '⚠️  FIREBASE_KEY_PATH non défini. Firebase Cloud Messaging ne sera pas disponible.',
     );
     return null;
   }
@@ -22,61 +22,34 @@ export const initializeFirebase = () => {
   let serviceAccount: any;
 
   try {
-    // Essayer plusieurs chemins possibles
-    const possiblePaths = [
-      path.resolve(process.cwd(), firebaseKeyPath), // Relatif à la racine du projet
-      path.resolve(__dirname, '../../..', firebaseKeyPath), // Relatif au dossier dist
-      path.resolve(firebaseKeyPath), // Chemin absolu ou relatif au CWD
-      path.join(process.cwd(), 'src', firebaseKeyPath), // Dans le dossier src
-    ];
-
-    let foundPath: string | null = null;
+    const absolutePath = path.resolve(firebaseKeyPath);
     
-    for (const testPath of possiblePaths) {
-      if (fs.existsSync(testPath)) {
-        foundPath = testPath;
-        break;
-      }
-    }
-
-    if (foundPath) {
-      const rawData = fs.readFileSync(foundPath, 'utf-8');
+    if (fs.existsSync(absolutePath)) {
+      const rawData = fs.readFileSync(absolutePath, 'utf-8');
       serviceAccount = JSON.parse(rawData);
-      console.log(`✅ Firebase service account key loaded from: ${foundPath}`);
-    } else if (process.env.FIREBASE_KEY) {
-      // Essayer de parser directement depuis les variables d'environnement (base64)
-      serviceAccount = JSON.parse(
-        Buffer.from(process.env.FIREBASE_KEY, 'base64').toString(),
-      );
-      console.log('✅ Firebase service account key loaded from FIREBASE_KEY environment variable');
+    } else if (fs.existsSync(firebaseKeyPath)) {
+      const rawData = fs.readFileSync(firebaseKeyPath, 'utf-8');
+      serviceAccount = JSON.parse(rawData);
     } else {
-      const triedPaths = possiblePaths.join('\n  - ');
-      throw new Error(
-        `Firebase service account key not found. Tried paths:\n  - ${triedPaths}\n` +
-        `Current working directory: ${process.cwd()}\n` +
-        `FIREBASE_KEY_PATH: ${firebaseKeyPath}`
+      // Essayer de parser directement depuis les variables d'environnement
+      serviceAccount = JSON.parse(
+        Buffer.from(process.env.FIREBASE_KEY || '', 'base64').toString(),
       );
     }
 
-    const app = admin.initializeApp({
+    return admin.initializeApp({
       credential: admin.credential.cert(serviceAccount),
     });
-    
-    console.log('✅ Firebase Admin SDK initialized successfully');
-    return app;
   } catch (error) {
-    console.error('❌ Firebase initialization failed:', error.message);
-    throw error;
+    console.error('Erreur lors de l\'initialisation de Firebase:', error);
+    return null;
   }
 };
 
 export const getFirebaseMessaging = () => {
-  try {
-    if (admin.apps.length === 0) {
-      return null;
-    }
-    return admin.messaging();
-  } catch (error) {
+  const app = admin.app();
+  if (!app) {
     return null;
   }
+  return admin.messaging(app);
 };
