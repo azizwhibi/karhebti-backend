@@ -235,96 +235,77 @@ export class RepairBaysService {
     return bay.save();
   }
 
-  async confirmReservation(reservationId: string): Promise<void> {
-    const reservation = await this.reservationModel.findById(reservationId).exec();
-  
-    if (!reservation) {
-      throw new NotFoundException('Réservation non trouvée');
-    }
+  // typescript
+async confirmReservation(reservationId: string): Promise<void> {
+  const reservation = await this.reservationModel.findById(reservationId).exec();
 
-    if (reservation.status === 'confirmé') {
-      throw new BadRequestException('Cette réservation est déjà confirmée');
-    }
-
-    if (reservation.status === 'annulé') {
-      throw new BadRequestException('Impossible de confirmer une réservation annulée');
-    }
-  
-    const repairBay = await this.repairBayModel.findById(reservation.repairBayId).exec();
-  
-    if (!repairBay) {
-      throw new NotFoundException('Créneau de réparation non trouvé');
-    }
-
-    // Normaliser la date pour la comparaison
-    const reservationDate = new Date(reservation.date);
-    const startOfDay = new Date(reservationDate);
-    startOfDay.setHours(0, 0, 0, 0);
-    const endOfDay = new Date(reservationDate);
-    endOfDay.setHours(23, 59, 59, 999);
-  
-    // ✅ Vérifier les conflits UNIQUEMENT avec les réservations CONFIRMÉES (pas en_attente)
-    const overlappingConfirmedReservations = await this.reservationModel.find({
-      _id: { $ne: reservationId }, // Exclure la réservation actuelle
-      repairBayId: reservation.repairBayId,
-      status: { $in: ['confirmé', 'en_cours'] }, // ✅ Seulement les confirmées
-      date: {
-        $gte: startOfDay,
-        $lte: endOfDay
-      },
-      $or: [
-        { 
-          heureDebut: { $lt: reservation.heureFin }, 
-          heureFin: { $gt: reservation.heureDebut } 
-        },
-      ],
-    }).exec();
-  
-    if (overlappingConfirmedReservations.length > 0) {
-      throw new BadRequestException(
-        `Le créneau "${repairBay.name}" est déjà occupé pour cette période par une réservation confirmée`
-      );
-    }
-  
-    // ✅ NOUVEAU: Annuler automatiquement toutes les autres réservations en_attente 
-    // pour le même créneau, même date et heures qui se chevauchent
-    const conflictingPendingReservations = await this.reservationModel.find({
-      _id: { $ne: reservationId }, // Exclure la réservation actuelle
-      repairBayId: reservation.repairBayId,
-      status: 'en_attente', // ✅ Seulement les en attente
-      date: {
-        $gte: startOfDay,
-        $lte: endOfDay
-      },
-      $or: [
-        { 
-          heureDebut: { $lt: reservation.heureFin }, 
-          heureFin: { $gt: reservation.heureDebut } 
-        },
-      ],
-    }).exec();
-
-    // Annuler toutes les réservations en conflit
-    if (conflictingPendingReservations.length > 0) {
-      await this.reservationModel.updateMany(
-        {
-          _id: { $in: conflictingPendingReservations.map(r => r._id) }
-        },
-        {
-          $set: { 
-            status: 'annulé',
-            commentaires: `Annulée automatiquement - Créneau confirmé pour une autre réservation`
-          }
-        }
-      ).exec();
-
-      console.log(`✅ ${conflictingPendingReservations.length} réservation(s) en attente annulée(s) automatiquement pour le créneau ${repairBay.name}`);
-    }
-  
-    // ✅ Confirmer la réservation
-    reservation.status = 'confirmé';
-    await reservation.save();
-
-    console.log(`✅ Réservation ${reservationId} confirmée pour le créneau ${repairBay.name}`);
+  if (!reservation) {
+    throw new NotFoundException('Réservation non trouvée');
   }
+
+  if (reservation.status === 'confirmé') {
+    throw new BadRequestException('Cette réservation est déjà confirmée');
+  }
+
+  if (reservation.status === 'annulé') {
+    throw new BadRequestException('Impossible de confirmer une réservation annulée');
+  }
+
+  // Récupérer toutes les bays actives du garage
+  const allBays = await this.repairBayModel.find({
+    garageId: reservation.garageId,
+    isActive: true
+  }).exec();
+
+  const totalBays = allBays.length;
+  if (totalBays === 0) {
+    throw new BadRequestException('Aucun créneau actif disponible dans ce garage');
+  }
+
+  // Normaliser la date pour la comparaison
+  const reservationDate = new Date(reservation.date);
+  const startOfDay = new Date(reservationDate);
+  startOfDay.setHours(0, 0, 0, 0);
+  const endOfDay = new Date(reservationDate);
+  endOfDay.setHours(23, 59, 59, 999);
+
+  // Obtenir les réservations CONFIRMÉES qui se chevauchent pour le même garage (toutes bays confondues)
+  const overlappingConfirmedReservations = await this.reservationModel.find({
+    _id: { $ne: reservationId },
+    garageId: reservation.garageId,
+    status: { $in: ['confirmé', 'en_cours'] },
+    date: {
+      $gte: startOfDay,
+      $lte: endOfDay
+    },
+    $or: [
+      {
+        heureDebut: { $lt: reservation.heureFin },
+        heureFin: { $gt: reservation.heureDebut }
+      }
+    ]
+  }).exec();
+
+  // Si la capacité est déjà remplie -> refus (propGarage devra choisir manuellement lesquelles annuler)
+  if (overlappingConfirmedReservations.length >= totalBays) {
+    throw new BadRequestException('Capacité du garage atteinte pour cette période');
+  }
+
+  // Trouver les bayIds déjà occupées par des réservations confirmées
+  const usedBayIds = new Set(overlappingConfirmedReservations.map(r => r.repairBayId?.toString()));
+
+  // Choisir une bay libre (parmi les bays actives)
+  const freeBay = allBays.find(b => !usedBayIds.has((b as any)._id.toString()));
+  if (!freeBay) {
+    throw new BadRequestException('Aucune bay disponible trouvée (incohérence)');
+  }
+
+  // Assigner la bay et confirmer la réservation (sans annuler automatiquement les autres en_attente)
+  reservation.repairBayId = (freeBay as any)._id;
+  reservation.status = 'confirmé';
+  await reservation.save();
+
+  console.log(`✅ Réservation ${reservationId} confirmée et assignée à la bay ${(reservation.repairBayId as any).toString()}`);
+}
+
 }

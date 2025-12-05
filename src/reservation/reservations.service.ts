@@ -93,8 +93,56 @@ export class ReservationsService {
       );
     }
 
-    // Prendre le premier créneau disponible
-    const selectedBay = availableBays[0];
+    // ✅ NOUVEAU: Trouver les créneaux déjà utilisés par des réservations en_attente
+    const startOfDay = new Date(date);
+    startOfDay.setHours(0, 0, 0, 0);
+    const endOfDay = new Date(date);
+    endOfDay.setHours(23, 59, 59, 999);
+
+    const pendingReservations = await this.reservationModel.find({
+      garageId: new Types.ObjectId(createDto.garageId),
+      status: 'en_attente',
+      date: {
+        $gte: startOfDay,
+        $lte: endOfDay
+      },
+      $or: [
+        {
+          heureDebut: { $lt: createDto.heureFin },
+          heureFin: { $gt: createDto.heureDebut }
+        }
+      ]
+    }).exec();
+
+    // Compter combien de fois chaque créneau est utilisé par des réservations en_attente
+    const bayUsageCount = new Map<string, number>();
+
+    // Initialiser tous les créneaux disponibles à 0
+    availableBays.forEach(bay => {
+      bayUsageCount.set((bay as any)._id.toString(), 0);
+    });
+
+    // Compter l'utilisation
+    pendingReservations.forEach(res => {
+      const bayId = res.repairBayId.toString();
+      if (bayUsageCount.has(bayId)) {
+        bayUsageCount.set(bayId, bayUsageCount.get(bayId)! + 1);
+      }
+    });
+
+    // ✅ Sélectionner le créneau le MOINS utilisé
+    let selectedBay = availableBays[0];
+    let minUsage = bayUsageCount.get((selectedBay as any)._id.toString()) || 0;
+
+    for (const bay of availableBays) {
+      const usage = bayUsageCount.get((bay as any)._id.toString()) || 0;
+      if (usage < minUsage) {
+        selectedBay = bay;
+        minUsage = usage;
+      }
+    }
+
+    console.log(`✅ Créneau sélectionné: ${(selectedBay as any).name} (usage actuel: ${minUsage} réservation(s) en attente)`);
 
     // Validate services if provided
     let services: string[] = [];
@@ -110,11 +158,11 @@ export class ReservationsService {
       services = [...createDto.services];
       totalAmount = validServices.reduce((sum: number, s: any) => sum + s.coutMoyen, 0);
     }
-    
+
     const reservationData: any = {
       userId: new Types.ObjectId(userId),
       garageId: new Types.ObjectId(createDto.garageId),
-      repairBayId: (selectedBay as any)._id, // ✅ Cast pour TypeScript
+      repairBayId: (selectedBay as any)._id, // ✅ Utilise le créneau le moins occupé
       date,
       heureDebut: createDto.heureDebut,
       heureFin: createDto.heureFin,
@@ -124,7 +172,7 @@ export class ReservationsService {
       isPaid: false,
       totalAmount
     };
-    
+
     const created = new this.reservationModel(reservationData);
     const saved = await created.save();
 
@@ -132,7 +180,7 @@ export class ReservationsService {
     return await this.reservationModel.findById(saved._id)
       .populate('userId', 'nom prenom email telephone role')
       .populate('garageId', 'nom adresse telephone')
-      .populate('repairBayId', 'name bayNumber heureOuverture heureFermeture') // ✅ Populate repair bay
+      .populate('repairBayId', 'name bayNumber heureOuverture heureFermeture')
       .exec();
   }
 
