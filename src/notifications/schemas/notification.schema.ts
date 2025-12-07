@@ -12,6 +12,8 @@ export enum NotificationType {
   SWIPE_ACCEPTED = 'swipe_accepted',
   SWIPE_DECLINED = 'swipe_declined',
   NEW_MESSAGE = 'new_message',
+  RESERVATION_CANCELLED = 'reservation_cancelled',  // ✅ NOUVEAU
+  RESERVATION_CONFIRMED = 'reservation_confirmed',
   CUSTOM = 'custom',
 }
 
@@ -32,7 +34,7 @@ export class Notification extends Document {
 
   @Prop({ required: true })
   title: string;
-
+ 
   @Prop()
   titre?: string; // French version for compatibility
 
@@ -56,6 +58,9 @@ export class Notification extends Document {
 
   @Prop({ type: Types.ObjectId, ref: 'Maintenance' })
   maintenanceId?: Types.ObjectId;
+
+  @Prop({ type: Types.ObjectId, ref: 'Reservation' })
+  reservationId?: Types.ObjectId; 
 
   @Prop({ type: Object })
   data?: Record<string, any>;

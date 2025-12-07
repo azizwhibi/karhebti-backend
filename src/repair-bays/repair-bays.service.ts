@@ -4,12 +4,13 @@ import { Model, Types } from 'mongoose';
 import { RepairBay, RepairBayDocument } from './schemas/repair-bay.schema';
 import { CreateRepairBayDto } from './dto/create-repair-bay.dto';
 import { UpdateRepairBayDto } from './dto/update-repair-bay.dto';
-
+import { NotificationsService } from '../notifications/notifications.service';
 @Injectable()
 export class RepairBaysService {
   constructor(
     @InjectModel(RepairBay.name) private repairBayModel: Model<RepairBayDocument>,
     @InjectModel('Reservation') private reservationModel: Model<any>,
+    private readonly notificationsService: NotificationsService, 
   ) {}
 
   /**
@@ -236,76 +237,248 @@ export class RepairBaysService {
   }
 
   // typescript
-async confirmReservation(reservationId: string): Promise<void> {
-  const reservation = await this.reservationModel.findById(reservationId).exec();
+  async confirmReservation(reservationId: string): Promise<void> {
+    const reservation = await this.reservationModel.findById(reservationId)
+      .populate('userId', 'nom prenom email deviceToken')  // ✅ Populate userId avec deviceToken
+      .populate('garageId', 'nom adresse')  // ✅ Populate garageId
+      .exec();
 
-  if (!reservation) {
-    throw new NotFoundException('Réservation non trouvée');
-  }
+    if (!reservation) {
+      throw new NotFoundException('Réservation non trouvée');
+    }
 
-  if (reservation.status === 'confirmé') {
-    throw new BadRequestException('Cette réservation est déjà confirmée');
-  }
+    if (reservation.status === 'confirmé') {
+      throw new BadRequestException('Cette réservation est déjà confirmée');
+    }
 
-  if (reservation.status === 'annulé') {
-    throw new BadRequestException('Impossible de confirmer une réservation annulée');
-  }
+    if (reservation.status === 'annulé') {
+      throw new BadRequestException('Impossible de confirmer une réservation annulée');
+    }
 
-  // Récupérer toutes les bays actives du garage
-  const allBays = await this.repairBayModel.find({
-    garageId: reservation.garageId,
-    isActive: true
-  }).exec();
+    // Récupérer toutes les bays actives du garage
+    const allBays = await this.repairBayModel.find({
+      garageId: reservation.garageId._id || reservation.garageId,
+      isActive: true
+    }).exec();
 
-  const totalBays = allBays.length;
-  if (totalBays === 0) {
-    throw new BadRequestException('Aucun créneau actif disponible dans ce garage');
-  }
+    const totalBays = allBays.length;
+    if (totalBays === 0) {
+      throw new BadRequestException('Aucun créneau actif disponible dans ce garage');
+    }
 
-  // Normaliser la date pour la comparaison
-  const reservationDate = new Date(reservation.date);
-  const startOfDay = new Date(reservationDate);
-  startOfDay.setHours(0, 0, 0, 0);
-  const endOfDay = new Date(reservationDate);
-  endOfDay.setHours(23, 59, 59, 999);
+    // Normaliser la date pour la comparaison
+    const reservationDate = new Date(reservation.date);
+    const startOfDay = new Date(reservationDate);
+    startOfDay.setHours(0, 0, 0, 0);
+    const endOfDay = new Date(reservationDate);
+    endOfDay.setHours(23, 59, 59, 999);
 
-  // Obtenir les réservations CONFIRMÉES qui se chevauchent pour le même garage (toutes bays confondues)
-  const overlappingConfirmedReservations = await this.reservationModel.find({
-    _id: { $ne: reservationId },
-    garageId: reservation.garageId,
-    status: { $in: ['confirmé', 'en_cours'] },
-    date: {
-      $gte: startOfDay,
-      $lte: endOfDay
-    },
-    $or: [
-      {
-        heureDebut: { $lt: reservation.heureFin },
-        heureFin: { $gt: reservation.heureDebut }
+    // Obtenir les réservations CONFIRMÉES qui se chevauchent pour le même garage (toutes bays confondues)
+    const overlappingConfirmedReservations = await this.reservationModel.find({
+      _id: { $ne: reservationId },
+      garageId: reservation.garageId._id || reservation.garageId,
+      status: { $in: ['confirmé', 'en_cours'] },
+      date: {
+        $gte: startOfDay,
+        $lte: endOfDay
+      },
+      $or: [
+        {
+          heureDebut: { $lt: reservation.heureFin },
+          heureFin: { $gt: reservation.heureDebut }
+        }
+      ]
+    }).exec();
+
+    // Si la capacité est déjà remplie -> refus
+    if (overlappingConfirmedReservations.length >= totalBays) {
+      throw new BadRequestException('Capacité du garage atteinte pour cette période. Impossible de confirmer cette réservation.');
+    }
+
+    // Trouver les bayIds déjà occupées par des réservations confirmées
+    const usedBayIds = new Set(overlappingConfirmedReservations.map(r => r.repairBayId?.toString()));
+
+    // Choisir une bay libre (parmi les bays actives)
+    const freeBay = allBays.find(b => !usedBayIds.has((b as any)._id.toString()));
+    if (!freeBay) {
+      throw new BadRequestException('Aucune bay disponible trouvée (incohérence)');
+    }
+
+    // ✅ ÉTAPE 1: D'abord, confirmer la réservation actuelle et assigner une bay
+    reservation.repairBayId = (freeBay as any)._id;
+    reservation.status = 'confirmé';
+    await reservation.save();
+
+    console.log(`✅ Réservation ${reservationId} confirmée et assignée à la bay ${freeBay.name}`);
+
+    // ✅ ÉTAPE 2: Envoyer une notification de confirmation à l'utilisateur
+    try {
+      const garageName = reservation.garageId?.nom || 'le garage';
+
+      await this.notificationsService.sendReservationConfirmedNotification(
+        reservation.userId._id.toString(),
+        reservation._id.toString(),
+        garageName,
+        reservation.date,
+        reservation.heureDebut,
+        reservation.heureFin,
+      );
+    } catch (notifError) {
+      console.error(`❌ Erreur lors de l'envoi de notification de confirmation:`, notifError.message);
+    }
+
+    // ✅ ÉTAPE 3: APRÈS confirmation, vérifier si le garage est maintenant COMPLET
+    const nowConfirmedCount = overlappingConfirmedReservations.length + 1; // +1 pour celle qu'on vient de confirmer
+
+    // Si le garage est maintenant COMPLET, annuler TOUTES les réservations en_attente restantes
+    if (nowConfirmedCount >= totalBays) {
+      console.log(`⚠️ Garage COMPLET (${nowConfirmedCount}/${totalBays} bays occupées) - Annulation des réservations en_attente restantes...`);
+
+      // Récupérer TOUTES les réservations EN_ATTENTE qui se chevauchent avec cette période
+      const conflictingPendingReservations = await this.reservationModel.find({
+        garageId: reservation.garageId._id || reservation.garageId,
+        status: 'en_attente',
+        date: {
+          $gte: startOfDay,
+          $lte: endOfDay
+        },
+        $or: [
+          {
+            heureDebut: { $lt: reservation.heureFin },
+            heureFin: { $gt: reservation.heureDebut }
+          }
+        ]
+      })
+      .populate('userId', 'nom prenom email deviceToken')
+      .populate('garageId', 'nom adresse')
+      .exec();
+
+      if (conflictingPendingReservations.length > 0) {
+        // Annuler TOUTES les réservations en_attente (car le garage est plein)
+        await this.reservationModel.updateMany(
+          {
+            _id: { $in: conflictingPendingReservations.map(r => r._id) }
+          },
+          {
+            $set: {
+              status: 'annulé',
+              commentaires: `Annulée automatiquement - Capacité du garage atteinte (${totalBays} créneaux complets)`
+            }
+          }
+        ).exec();
+
+        console.log(`✅ ${conflictingPendingReservations.length} réservation(s) en attente annulée(s) automatiquement (garage complet)`);
+
+        // ✅ Envoyer des notifications à TOUS les utilisateurs concernés
+        for (const cancelledReservation of conflictingPendingReservations) {
+          try {
+            const garageName = cancelledReservation.garageId?.nom || 'le garage';
+
+            await this.notificationsService.sendReservationCancelledNotification(
+              cancelledReservation.userId._id.toString(),
+              cancelledReservation._id.toString(),
+              garageName,
+              cancelledReservation.date,
+              cancelledReservation.heureDebut,
+              cancelledReservation.heureFin,
+            );
+
+            console.log(`✅ Notification d'annulation envoyée à l'utilisateur ${cancelledReservation.userId._id}`);
+          } catch (notifError) {
+            console.error(`❌ Erreur lors de l'envoi de notification pour la réservation ${cancelledReservation._id}:`, notifError.message);
+          }
+        }
+      } else {
+        console.log(`ℹ️ Garage complet mais aucune réservation en_attente à annuler`);
       }
-    ]
+    } else {
+      console.log(`ℹ️ Garage pas encore complet (${nowConfirmedCount}/${totalBays} bays occupées) - Les réservations en_attente restent disponibles`);
+    }
+  }
+
+  /**
+ * ✅ NEW: Supprimer les créneaux dans une plage de bayNumber
+ * Annule également les réservations associées
+ */
+async deleteBaysByNumberRange(
+  garageId: string,
+  minBayNumber: number,
+  maxBayNumber: number
+): Promise<void> {
+  if (!Types.ObjectId.isValid(garageId)) {
+    throw new BadRequestException('ID garage invalide');
+  }
+
+  console.log(`🔍 Searching for repair bays to delete (bayNumber ${minBayNumber}-${maxBayNumber}) for garage ${garageId}`);
+
+  // Find all bays in the range
+  const baysToDelete = await this.repairBayModel.find({
+    garageId: new Types.ObjectId(garageId),
+    bayNumber: { $gte: minBayNumber, $lte: maxBayNumber }
   }).exec();
 
-  // Si la capacité est déjà remplie -> refus (propGarage devra choisir manuellement lesquelles annuler)
-  if (overlappingConfirmedReservations.length >= totalBays) {
-    throw new BadRequestException('Capacité du garage atteinte pour cette période');
+  if (baysToDelete.length === 0) {
+    console.log(`ℹ️ No repair bays found in range ${minBayNumber}-${maxBayNumber}`);
+    return;
   }
 
-  // Trouver les bayIds déjà occupées par des réservations confirmées
-  const usedBayIds = new Set(overlappingConfirmedReservations.map(r => r.repairBayId?.toString()));
+  console.log(`🗑️ Found ${baysToDelete.length} repair bay(s) to delete`);
 
-  // Choisir une bay libre (parmi les bays actives)
-  const freeBay = allBays.find(b => !usedBayIds.has((b as any)._id.toString()));
-  if (!freeBay) {
-    throw new BadRequestException('Aucune bay disponible trouvée (incohérence)');
+  const bayIds = baysToDelete.map(bay => (bay as any)._id);
+
+  // ✅ Find all reservations using these bays
+  const affectedReservations = await this.reservationModel.find({
+    repairBayId: { $in: bayIds },
+    status: { $in: ['en_attente', 'confirmé', 'en_cours'] }
+  })
+  .populate('userId', 'nom prenom email deviceToken')
+  .populate('garageId', 'nom adresse')
+  .exec();
+
+  console.log(`📋 Found ${affectedReservations.length} active reservation(s) affected`);
+
+  // ✅ Cancel all affected reservations
+  if (affectedReservations.length > 0) {
+    await this.reservationModel.updateMany(
+      { repairBayId: { $in: bayIds } },
+      {
+        $set: {
+          status: 'annulé',
+          commentaires: `Annulée automatiquement - Créneau de réparation supprimé par le propriétaire du garage`
+        }
+      }
+    ).exec();
+
+    console.log(`✅ ${affectedReservations.length} reservation(s) cancelled`);
+
+    // ✅ Send notifications to all affected users
+    for (const reservation of affectedReservations) {
+      try {
+        const garageName = reservation.garageId?.nom || 'le garage';
+
+        await this.notificationsService.sendReservationCancelledNotification(
+          reservation.userId._id.toString(),
+          reservation._id.toString(),
+          garageName,
+          reservation.date,
+          reservation.heureDebut,
+          reservation.heureFin,
+        );
+
+        console.log(`📲 Cancellation notification sent to user ${reservation.userId._id}`);
+      } catch (notifError) {
+        console.error(`❌ Error sending notification for reservation ${reservation._id}:`, notifError.message);
+      }
+    }
   }
 
-  // Assigner la bay et confirmer la réservation (sans annuler automatiquement les autres en_attente)
-  reservation.repairBayId = (freeBay as any)._id;
-  reservation.status = 'confirmé';
-  await reservation.save();
+  // ✅ Delete the repair bays
+  const deleteResult = await this.repairBayModel.deleteMany({
+    _id: { $in: bayIds }
+  }).exec();
 
-  console.log(`✅ Réservation ${reservationId} confirmée et assignée à la bay ${(reservation.repairBayId as any).toString()}`);
+  console.log(`✅ Deleted ${deleteResult.deletedCount} repair bay(s) successfully`);
 }
+
 
 }

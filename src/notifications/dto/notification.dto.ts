@@ -16,6 +16,10 @@ export class SendNotificationDto {
   @IsString()
   titre: string;
 
+  @IsOptional()
+  @IsString()
+  title?: string;
+
   @IsNotEmpty()
   @IsString()
   message: string;
@@ -30,6 +34,9 @@ export class SendNotificationDto {
   @IsOptional()
   maintenanceId?: string;
 
+  @IsOptional()
+  reservationId?: string;
+  
   @IsOptional()
   data?: Record<string, any>;
 }

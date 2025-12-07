@@ -5,6 +5,8 @@ import * as bcrypt from 'bcrypt';
 import { User, UserDocument } from './schemas/user.schema';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { Types } from 'mongoose';
+import { BadRequestException } from '@nestjs/common';
 
 @Injectable()
 export class UsersService {
@@ -89,5 +91,19 @@ export class UsersService {
       throw new NotFoundException('Utilisateur non trouvé');
     }
     return updatedUser;
+  }
+
+  async findById(userId: string): Promise<User> {
+    if (!Types.ObjectId || !Types.ObjectId.isValid(userId)) {
+      throw new BadRequestException('ID utilisateur invalide');
+    }
+    
+    const user = await this.userModel.findById(userId).exec();
+    
+    if (!user) {
+      throw new NotFoundException('Utilisateur non trouvé');
+    }
+    
+    return user;
   }
 }
