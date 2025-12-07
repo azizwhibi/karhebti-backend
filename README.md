@@ -1,93 +1,262 @@
-# Karhebti Backend - API REST Complète
+# Karhebti Android - Vehicle Maintenance Management App
 
-Backend REST complet développé avec **NestJS**, **TypeScript**, **MongoDB (Mongoose)** et **JWT** pour la gestion automobile avec fonctionnalités IA.
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+A modern Android application for managing vehicle maintenance, documents, and garage appointments with a beautiful Material Design 3 UI.
 
-## Description
+## 🎨 Design System
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+### Color Palette
+- **Main Purple**: `#6658DD` - Primary brand color
+- **Soft White**: `#FAFAFA` - Background color
+- **Light Purple**: `#EBEAFE` - Secondary elements
+- **Accent Green**: `#A4E8E0` - Success/Good status
+- **Alert Red**: `#FE8596` - Urgent notifications
+- **Accent Yellow**: `#FFD067` - Warning/Attention
 
-## Project setup
+### Typography
+- **Headings**: Bold, 20-24sp (Roboto)
+- **Subheadings**: Medium, 16-18sp
+- **Body**: Regular, 14-16sp
 
-```bash
-$ npm install
+### Design Principles
+- All cards and buttons: 12-20dp rounded corners
+- Subtle shadows for depth
+- 16dp padding on all sides
+- 12-20dp vertical spacing between elements
+
+## 📱 Features
+
+### Authentication
+- ✅ Login Screen with email/password
+- ✅ Sign Up Screen with validation
+- ✅ Forgot Password functionality
+
+### Dashboard
+- ✅ Important Alerts section (maintenance reminders, fuel level)
+- ✅ Quick Actions (Vehicles, Maintenance, Documents, Garages)
+- ✅ Overview statistics
+
+### Vehicle Management
+- ✅ List all vehicles
+- ✅ Vehicle status tracking (Good, Attention, Urgent)
+- ✅ Mileage tracking
+- ✅ Next maintenance reminders
+- ✅ Add new vehicles
+
+### Maintenance (Entretiens)
+- ✅ Upcoming maintenance view
+- ✅ Maintenance history
+- ✅ Urgency levels (Normal, Attention, Urgent)
+- ✅ Task lists for each maintenance
+- ✅ Price tracking
+- ✅ Garage location
+
+### Documents
+- ✅ Document upload and management
+- ✅ Filter by type (Administrative, Maintenance)
+- ✅ File size display
+- ✅ Download functionality
+- ✅ Vehicle association
+
+### Garages
+- ✅ Garage search
+- ✅ Distance calculation
+- ✅ Rating and reviews
+- ✅ Opening hours
+- ✅ Service filters
+- ✅ Call and booking functionality
+
+### Settings
+- ✅ User profile management
+- ✅ Notifications toggle
+- ✅ Dark mode support
+- ✅ Language selection
+- ✅ Two-factor authentication
+- ✅ Help center and support
+- ✅ Logout functionality
+
+## 🏗️ Architecture
+
+### Tech Stack
+- **Language**: Kotlin
+- **UI Framework**: Jetpack Compose
+- **Architecture**: MVVM (Model-View-ViewModel)
+- **Navigation**: Jetpack Navigation Compose
+- **Dependency Injection**: Manual (ready for Hilt/Dagger)
+- **Backend**: MongoDB (localhost:27017/karhebti)
+- **Networking**: Retrofit + OkHttp
+- **Image Loading**: Coil
+
+### Project Structure
+```
+app/
+├── data/
+│   ├── api/          # API configuration and services
+│   └── model/        # Data models (Vehicle, Entretien, Document, Garage, User)
+├── navigation/       # Navigation graph and routes
+├── ui/
+│   ├── screens/      # All screen composables
+│   └── theme/        # Theme, colors, typography
+└── MainActivity.kt   # App entry point
 ```
 
-## Compile and run the project
+## 🚀 Getting Started
 
+### Prerequisites
+- Android Studio Hedgehog or later
+- JDK 11 or later
+- Android SDK 24+ (Nougat 7.0)
+- MongoDB instance running on localhost:27017
+
+### Installation
+
+1. Clone the repository
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+git clone https://github.com/yourusername/karhebti-android.git
+cd karhebti-android
 ```
 
-## Run tests
+2. Open the project in Android Studio
 
+3. Sync Gradle dependencies
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+./gradlew build
 ```
 
-## Deployment
+4. Configure MongoDB backend
+   - Ensure MongoDB is running on `localhost:27017`
+   - Database name: `karhebti`
+   - Update `ApiConfig.kt` if using a different host
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+5. Run the app
+   - For emulator: The app uses `http://10.0.2.2:27017/`
+   - For physical device: Update the BASE_URL in `ApiConfig.kt`
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+## 📦 Dependencies
 
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+```kotlin
+// Core
+androidx.core:core-ktx:1.17.0
+androidx.lifecycle:lifecycle-runtime-ktx:2.9.4
+androidx.activity:activity-compose:1.11.0
+
+// Compose
+androidx.compose:compose-bom:2024.09.00
+androidx.compose.ui:ui
+androidx.compose.material3:material3
+androidx.compose.material:material-icons-extended
+
+// Navigation
+androidx.navigation:navigation-compose:2.8.0
+androidx.lifecycle:lifecycle-viewmodel-compose:2.9.4
+
+// Networking
+com.squareup.retrofit2:retrofit:2.9.0
+com.squareup.retrofit2:converter-gson:2.9.0
+com.squareup.okhttp3:okhttp:4.12.0
+com.squareup.okhttp3:logging-interceptor:4.12.0
+
+// Image Loading
+io.coil-kt:coil-compose:2.5.0
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+## 🎯 Screens Overview
 
-## Resources
+1. **LoginScreen** - User authentication with email/password
+2. **SignUpScreen** - New user registration
+3. **ForgotPasswordScreen** - Password reset functionality
+4. **HomeScreen** - Dashboard with alerts and quick actions
+5. **VehiclesScreen** - Vehicle management and listing
+6. **EntretiensScreen** - Maintenance scheduler and history
+7. **DocumentsScreen** - Document manager with filters
+8. **GaragesScreen** - Garage finder with search and filters
+9. **SettingsScreen** - User preferences and profile
 
-Check out a few resources that may come in handy when working with NestJS:
+## 🎨 Design Highlights
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+### Material Design 3
+- Modern rounded corners on all UI elements
+- Elevation and shadows for depth
+- Consistent color scheme throughout
+- Responsive touch targets (minimum 48dp)
 
-## Support
+### French Localization
+- All UI text in French
+- Date and time formatting for French locale
+- Currency display in Euros (€)
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+### Status Indicators
+- **Green** - Good/Success
+- **Yellow** - Warning/Attention
+- **Red** - Urgent/Error
 
-## Stay in touch
+## 🔧 Configuration
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+### API Configuration
+Edit `app/src/main/java/com/example/karhebti_android/data/api/ApiConfig.kt`:
 
-## License
+```kotlin
+object ApiConfig {
+    const val BASE_URL = "http://10.0.2.2:27017/" // For Emulator
+    const val MONGODB_URL = "mongodb://localhost:27017/karhebti"
+}
+```
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+### Theme Customization
+Edit `app/src/main/java/com/example/karhebti_android/ui/theme/Color.kt` to customize colors.
+
+## 📝 Data Models
+
+### Vehicle
+- ID, name, brand, model, year
+- Plate number, mileage
+- Status (BON, ATTENTION, URGENT)
+- Next maintenance info
+
+### Entretien (Maintenance)
+- ID, vehicle reference
+- Type (VIDANGE, REVISION, PNEUS, etc.)
+- Date, location, garage
+- Price, urgency level
+- Task list
+
+### Document
+- ID, vehicle reference
+- Name, type, subtype
+- Upload/expiry dates
+- File URL and size
+
+### Garage
+- ID, name, address, coordinates
+- Distance, rating, reviews
+- Phone, opening hours
+- Available services
+
+## 🤝 Contributing
+
+Contributions are welcome! Please follow these steps:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## 👨‍💻 Author
+
+Karhebti Development Team
+
+## 🙏 Acknowledgments
+
+- Material Design 3 guidelines
+- Jetpack Compose documentation
+- Android development community
+
+---
+
+**Version**: 1.0.0  
+**Last Updated**: November 2025
+

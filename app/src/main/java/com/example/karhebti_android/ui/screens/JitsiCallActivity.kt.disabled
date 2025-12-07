@@ -1,0 +1,175 @@
+package com.example.karhebti_android.ui.screens
+
+import android.Manifest
+import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.Uri
+import android.os.Bundle
+import android.widget.Toast
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.unit.dp
+import com.example.karhebti_android.ui.theme.KarhebtiandroidTheme
+import org.jitsi.meet.sdk.JitsiMeet
+import org.jitsi.meet.sdk.JitsiMeetActivity
+import org.jitsi.meet.sdk.JitsiMeetConferenceOptions
+import java.net.MalformedURLException
+import java.net.URL
+
+/**
+ * Simple Activity to join a Jitsi room (audio/video) using the Jitsi Meet Android SDK.
+ * - Requests CAMERA and RECORD_AUDIO permissions at runtime.
+ * - Lets the user enter a room name (use SOS id or generated room token).
+ * - Launches JitsiMeetActivity to join the room.
+ *
+ * Manual steps (see README below): add dependency in app/build.gradle:
+ * implementation ('org.jitsi.react:jitsi-meet-sdk:3.10.2') { transitive = true }
+ * and enable Internet, CAMERA and RECORD_AUDIO permissions in AndroidManifest.xml (already present).
+ */
+class JitsiCallActivity : ComponentActivity() {
+
+    private val requestPermissions = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { results ->
+        val granted = results.entries.all { it.value == true }
+        if (granted) {
+            // Permissions granted, continue to join
+            pendingRoom?.let { joinRoomInternal(it) }
+        } else {
+            Toast.makeText(this, "Permissions caméra/micro requises pour l'appel", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    // store pending room if permissions are requested
+    private var pendingRoom: String? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        // Initialize Jitsi default options (server). We use public meet.jit.si by default.
+        try {
+            val defaultOptions = JitsiMeetConferenceOptions.Builder()
+                .setServerURL(URL("https://meet.jit.si"))
+                .setWelcomePageEnabled(false)
+                .build()
+            JitsiMeet.setDefaultConferenceOptions(defaultOptions)
+        } catch (e: MalformedURLException) {
+            // Should not happen for hardcoded URL
+            e.printStackTrace()
+        }
+
+        setContent {
+            KarhebtiandroidTheme {
+                Surface(color = MaterialTheme.colorScheme.background) {
+                    JitsiCallScreen(onJoinClick = { room ->
+                        attemptJoin(room)
+                    }, onOpenSettings = { openAppSettings(this) })
+                }
+            }
+        }
+    }
+
+    private fun attemptJoin(room: String) {
+        // Check permissions
+        val hasCamera = checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
+        val hasAudio = checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
+        if (!hasCamera || !hasAudio) {
+            // Save room and request permissions
+            pendingRoom = room
+            requestPermissions.launch(arrayOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO))
+            return
+        }
+        // All permissions present
+        joinRoomInternal(room)
+    }
+
+    private fun joinRoomInternal(room: String) {
+        if (room.isBlank()) {
+            Toast.makeText(this, "Room invalide", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        try {
+            val options = JitsiMeetConferenceOptions.Builder()
+                .setRoom(room)
+                .setAudioOnly(false)
+                .setAudioMuted(false)
+                .setVideoMuted(false)
+                .setWelcomePageEnabled(false)
+                .build()
+
+            // Launch the native Jitsi activity which handles UI/controls
+            JitsiMeetActivity.launch(this, options)
+        } catch (e: Exception) {
+            Toast.makeText(this, "Impossible de démarrer l'appel: ${e.message}", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun openAppSettings(ctx: Context) {
+        val intent = Intent().apply {
+            action = android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+            data = Uri.fromParts("package", ctx.packageName, null)
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        }
+        startActivity(intent)
+    }
+}
+
+@Composable
+fun JitsiCallScreen(onJoinClick: (String) -> Unit, onOpenSettings: () -> Unit) {
+    val context = LocalContext.current
+    var text by remember { mutableStateOf(TextFieldValue("")) }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(20.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text("Appel SOS - Rejoindre room", style = MaterialTheme.typography.titleMedium)
+        Spacer(modifier = Modifier.height(12.dp))
+
+        BasicTextField(
+            value = text,
+            onValueChange = { text = it },
+            singleLine = true,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp)
+                .padding(8.dp)
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        Button(onClick = { onJoinClick(text.text.trim()) }, modifier = Modifier.fillMaxWidth()) {
+            Text("Rejoindre l'appel")
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Button(onClick = { onOpenSettings() }, modifier = Modifier.fillMaxWidth()) {
+            Text("Ouvrir paramètres (permissions)")
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        Text("Conseils:")
+        Text("- Entrez l'ID de la room fourni par le backend (ex: sos-12345)")
+        Text("- Si vous voyez une page vide, vérifiez les permissions caméra/micro et la connexion réseau.")
+    }
+}
+

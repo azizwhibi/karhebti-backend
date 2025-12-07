@@ -1,0 +1,236 @@
+Starting a Gradle Daemon, 1 busy and 1 incompatible and 1 stopped Daemons could not be reused, use --status for details
+> Task :app:clean
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preDebugBuild UP-TO-DATE
+> Task :app:mergeDebugNativeDebugMetadata NO-SOURCE
+> Task :app:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :app:checkDebugAarMetadata
+> Task :app:processDebugNavigationResources
+> Task :app:generateDebugResValues
+> Task :app:compileDebugNavigationResources
+> Task :app:processDebugGoogleServices
+> Task :app:mapDebugSourceSetPaths
+> Task :app:generateDebugResources
+> Task :app:packageDebugResources
+> Task :app:createDebugCompatibleScreenManifests
+> Task :app:extractDeepLinksDebug
+> Task :app:mergeDebugResources
+> Task :app:parseDebugLocalResources
+
+> Task :app:processDebugMainManifest
+package="com.example.karhebti_android" found in source AndroidManifest.xml: C:\Users\Mosbeh Eya\Desktop\karhebti-android-gestionVoitures\app\src\main\AndroidManifest.xml.
+Setting the namespace via the package attribute in the source AndroidManifest.xml is no longer supported, and the value is ignored.
+Recommendation: remove package="com.example.karhebti_android" from the source AndroidManifest.xml: C:\Users\Mosbeh Eya\Desktop\karhebti-android-gestionVoitures\app\src\main\AndroidManifest.xml.
+
+> Task :app:processDebugManifest
+> Task :app:javaPreCompileDebug
+> Task :app:mergeDebugShaders
+> Task :app:compileDebugShaders NO-SOURCE
+> Task :app:generateDebugAssets UP-TO-DATE
+> Task :app:mergeDebugAssets
+> Task :app:compressDebugAssets
+> Task :app:processDebugManifestForPackage
+> Task :app:checkDebugDuplicateClasses
+> Task :app:desugarDebugFileDependencies
+> Task :app:mergeDebugJniLibFolders
+> Task :app:mergeLibDexDebug
+> Task :app:mergeDebugNativeLibs
+> Task :app:validateSigningDebug
+> Task :app:writeDebugAppMetadata
+
+> Task :app:stripDebugDebugSymbols
+Unable to strip the following libraries, packaging them as they are: libandroidx.graphics.path.so. Run with --info option to learn more.
+
+> Task :app:writeDebugSigningConfigVersions
+> Task :app:preReleaseBuild UP-TO-DATE
+> Task :app:mergeReleaseJniLibFolders
+> Task :app:mergeReleaseNativeLibs
+
+> Task :app:stripReleaseDebugSymbols
+Unable to strip the following libraries, packaging them as they are: libandroidx.graphics.path.so. Run with --info option to learn more.
+
+> Task :app:checkReleaseDuplicateClasses
+> Task :app:buildKotlinToolingMetadata
+> Task :app:extractReleaseNativeSymbolTables
+> Task :app:checkReleaseAarMetadata
+> Task :app:processReleaseNavigationResources
+> Task :app:mergeReleaseNativeDebugMetadata NO-SOURCE
+> Task :app:compileReleaseNavigationResources
+> Task :app:generateReleaseResValues
+> Task :app:processReleaseGoogleServices
+> Task :app:mapReleaseSourceSetPaths
+> Task :app:generateReleaseResources
+> Task :app:processDebugResources
+> Task :app:mergeReleaseResources
+> Task :app:packageReleaseResources
+> Task :app:createReleaseCompatibleScreenManifests
+> Task :app:extractDeepLinksRelease
+> Task :app:parseReleaseLocalResources
+
+> Task :app:processReleaseMainManifest
+package="com.example.karhebti_android" found in source AndroidManifest.xml: C:\Users\Mosbeh Eya\Desktop\karhebti-android-gestionVoitures\app\src\main\AndroidManifest.xml.
+Setting the namespace via the package attribute in the source AndroidManifest.xml is no longer supported, and the value is ignored.
+Recommendation: remove package="com.example.karhebti_android" from the source AndroidManifest.xml: C:\Users\Mosbeh Eya\Desktop\karhebti-android-gestionVoitures\app\src\main\AndroidManifest.xml.
+
+> Task :app:processReleaseManifest
+> Task :app:javaPreCompileRelease
+> Task :app:desugarReleaseFileDependencies
+> Task :app:mergeReleaseStartupProfile UP-TO-DATE
+> Task :app:mergeReleaseShaders
+> Task :app:compileReleaseShaders NO-SOURCE
+> Task :app:generateReleaseAssets UP-TO-DATE
+> Task :app:mergeReleaseAssets
+> Task :app:compressReleaseAssets
+> Task :app:mergeReleaseArtProfile
+> Task :app:extractReleaseVersionControlInfo
+> Task :app:extractProguardFiles
+> Task :app:collectReleaseDependencies
+> Task :app:sdkReleaseDependencyData
+> Task :app:writeReleaseAppMetadata
+> Task :app:writeReleaseSigningConfigVersions
+> Task :app:preDebugAndroidTestBuild SKIPPED
+> Task :app:generateDebugAndroidTestResValues
+> Task :app:preDebugUnitTestBuild UP-TO-DATE
+> Task :app:preReleaseUnitTestBuild UP-TO-DATE
+> Task :app:javaPreCompileDebugUnitTest
+> Task :app:processReleaseManifestForPackage
+> Task :app:javaPreCompileReleaseUnitTest
+> Task :app:processReleaseResources
+> Task :app:optimizeReleaseResources
+
+> Task :app:compileDebugKotlin
+e: file:///C:/Users/Mosbeh%20Eya/Desktop/karhebti-android-gestionVoitures/app/src/main/java/com/example/karhebti_android/jitsi/JitsiCallActivity.kt:9:27 Unresolved reference 'app'.
+e: file:///C:/Users/Mosbeh%20Eya/Desktop/karhebti-android-gestionVoitures/app/src/main/java/com/example/karhebti_android/jitsi/JitsiCallActivity.kt:11:12 Unresolved reference 'jitsi'.
+e: file:///C:/Users/Mosbeh%20Eya/Desktop/karhebti-android-gestionVoitures/app/src/main/java/com/example/karhebti_android/jitsi/JitsiCallActivity.kt:12:12 Unresolved reference 'jitsi'.
+e: file:///C:/Users/Mosbeh%20Eya/Desktop/karhebti-android-gestionVoitures/app/src/main/java/com/example/karhebti_android/jitsi/JitsiCallActivity.kt:20:27 Unresolved reference 'AppCompatActivity'.
+e: file:///C:/Users/Mosbeh%20Eya/Desktop/karhebti-android-gestionVoitures/app/src/main/java/com/example/karhebti_android/jitsi/JitsiCallActivity.kt:26:38 Unresolved reference 'registerForActivityResult'.
+e: file:///C:/Users/Mosbeh%20Eya/Desktop/karhebti-android-gestionVoitures/app/src/main/java/com/example/karhebti_android/jitsi/JitsiCallActivity.kt:28:9 Cannot infer type for this parameter. Please specify it explicitly.
+e: file:///C:/Users/Mosbeh%20Eya/Desktop/karhebti-android-gestionVoitures/app/src/main/java/com/example/karhebti_android/jitsi/JitsiCallActivity.kt:29:60 Operator '==' cannot be applied to 'kotlin.text.MatchGroup?' and 'kotlin.Boolean'.
+e: file:///C:/Users/Mosbeh%20Eya/Desktop/karhebti-android-gestionVoitures/app/src/main/java/com/example/karhebti_android/jitsi/JitsiCallActivity.kt:31:13 Unresolved reference 'intent'.
+e: file:///C:/Users/Mosbeh%20Eya/Desktop/karhebti-android-gestionVoitures/app/src/main/java/com/example/karhebti_android/jitsi/JitsiCallActivity.kt:31:13 Argument type mismatch: actual type is 'R?', but 'K' was expected.
+e: file:///C:/Users/Mosbeh%20Eya/Desktop/karhebti-android-gestionVoitures/app/src/main/java/com/example/karhebti_android/jitsi/JitsiCallActivity.kt:31:44 Cannot infer type for this parameter. Please specify it explicitly.
+e: file:///C:/Users/Mosbeh%20Eya/Desktop/karhebti-android-gestionVoitures/app/src/main/java/com/example/karhebti_android/jitsi/JitsiCallActivity.kt:31:50 Cannot infer type for this parameter. Please specify it explicitly.
+e: file:///C:/Users/Mosbeh%20Eya/Desktop/karhebti-android-gestionVoitures/app/src/main/java/com/example/karhebti_android/jitsi/JitsiCallActivity.kt:33:19 None of the following candidates is applicable:
+static fun makeText(p0: Context!, p1: Int, p2: Int): Toast!
+static fun makeText(p0: Context!, p1: CharSequence!, p2: Int): Toast!
+e: file:///C:/Users/Mosbeh%20Eya/Desktop/karhebti-android-gestionVoitures/app/src/main/java/com/example/karhebti_android/jitsi/JitsiCallActivity.kt:33:106 Unresolved reference 'show'.
+e: file:///C:/Users/Mosbeh%20Eya/Desktop/karhebti-android-gestionVoitures/app/src/main/java/com/example/karhebti_android/jitsi/JitsiCallActivity.kt:34:13 Unresolved reference 'finish'.
+e: file:///C:/Users/Mosbeh%20Eya/Desktop/karhebti-android-gestionVoitures/app/src/main/java/com/example/karhebti_android/jitsi/JitsiCallActivity.kt:38:5 'onCreate' overrides nothing.
+e: file:///C:/Users/Mosbeh%20Eya/Desktop/karhebti-android-gestionVoitures/app/src/main/java/com/example/karhebti_android/jitsi/JitsiCallActivity.kt:39:9 Unresolved reference 'AppCompatActivity'.
+e: file:///C:/Users/Mosbeh%20Eya/Desktop/karhebti-android-gestionVoitures/app/src/main/java/com/example/karhebti_android/jitsi/JitsiCallActivity.kt:39:15 Unresolved reference 'onCreate'.
+e: file:///C:/Users/Mosbeh%20Eya/Desktop/karhebti-android-gestionVoitures/app/src/main/java/com/example/karhebti_android/jitsi/JitsiCallActivity.kt:41:20 Unresolved reference 'intent'.
+e: file:///C:/Users/Mosbeh%20Eya/Desktop/karhebti-android-gestionVoitures/app/src/main/java/com/example/karhebti_android/jitsi/JitsiCallActivity.kt:43:19 None of the following candidates is applicable:
+static fun makeText(p0: Context!, p1: Int, p2: Int): Toast!
+static fun makeText(p0: Context!, p1: CharSequence!, p2: Int): Toast!
+e: file:///C:/Users/Mosbeh%20Eya/Desktop/karhebti-android-gestionVoitures/app/src/main/java/com/example/karhebti_android/jitsi/JitsiCallActivity.kt:43:71 Unresolved reference 'show'.
+e: file:///C:/Users/Mosbeh%20Eya/Desktop/karhebti-android-gestionVoitures/app/src/main/java/com/example/karhebti_android/jitsi/JitsiCallActivity.kt:44:13 Unresolved reference 'finish'.
+e: file:///C:/Users/Mosbeh%20Eya/Desktop/karhebti-android-gestionVoitures/app/src/main/java/com/example/karhebti_android/jitsi/JitsiCallActivity.kt:49:47 Argument type mismatch: actual type is 'com.example.karhebti_android.jitsi.JitsiCallActivity', but '@NonNull() android.content.Context!' was expected.
+e: file:///C:/Users/Mosbeh%20Eya/Desktop/karhebti-android-gestionVoitures/app/src/main/java/com/example/karhebti_android/jitsi/JitsiCallActivity.kt:55:24 Argument type mismatch: actual type is 'kotlin.Any', but 'kotlin.String' was expected.
+e: file:///C:/Users/Mosbeh%20Eya/Desktop/karhebti-android-gestionVoitures/app/src/main/java/com/example/karhebti_android/jitsi/JitsiCallActivity.kt:61:27 Unresolved reference 'JitsiMeetConferenceOptions'.
+e: file:///C:/Users/Mosbeh%20Eya/Desktop/karhebti-android-gestionVoitures/app/src/main/java/com/example/karhebti_android/jitsi/JitsiCallActivity.kt:69:13 Unresolved reference 'JitsiMeetActivity'.
+e: file:///C:/Users/Mosbeh%20Eya/Desktop/karhebti-android-gestionVoitures/app/src/main/java/com/example/karhebti_android/jitsi/JitsiCallActivity.kt:71:13 Unresolved reference 'finish'.
+e: file:///C:/Users/Mosbeh%20Eya/Desktop/karhebti-android-gestionVoitures/app/src/main/java/com/example/karhebti_android/jitsi/JitsiCallActivity.kt:73:19 None of the following candidates is applicable:
+static fun makeText(p0: Context!, p1: Int, p2: Int): Toast!
+static fun makeText(p0: Context!, p1: CharSequence!, p2: Int): Toast!
+e: file:///C:/Users/Mosbeh%20Eya/Desktop/karhebti-android-gestionVoitures/app/src/main/java/com/example/karhebti_android/jitsi/JitsiCallActivity.kt:73:100 Unresolved reference 'show'.
+e: file:///C:/Users/Mosbeh%20Eya/Desktop/karhebti-android-gestionVoitures/app/src/main/java/com/example/karhebti_android/jitsi/JitsiCallActivity.kt:74:13 Unresolved reference 'finish'.
+e: file:///C:/Users/Mosbeh%20Eya/Desktop/karhebti-android-gestionVoitures/app/src/main/java/com/example/karhebti_android/navigation/NavGraph.kt:250:17 No parameter with name 'onBackClick' found.
+e: file:///C:/Users/Mosbeh%20Eya/Desktop/karhebti-android-gestionVoitures/app/src/main/java/com/example/karhebti_android/navigation/NavGraph.kt:250:17 No value passed for parameter 'items'.
+e: file:///C:/Users/Mosbeh%20Eya/Desktop/karhebti-android-gestionVoitures/app/src/main/java/com/example/karhebti_android/ui/screens/BreakdownHistoryScreen.kt:12:43 Cannot access 'val RowColumnParentData?.weight: Float': it is internal in file.
+e: file:///C:/Users/Mosbeh%20Eya/Desktop/karhebti-android-gestionVoitures/app/src/main/java/com/example/karhebti_android/ui/screens/BreakdownHistoryScreen.kt:21:35 Unresolved reference 'icons'.
+e: file:///C:/Users/Mosbeh%20Eya/Desktop/karhebti-android-gestionVoitures/app/src/main/java/com/example/karhebti_android/ui/screens/BreakdownHistoryScreen.kt:100:48 Unresolved reference 'Icons'.
+e: file:///C:/Users/Mosbeh%20Eya/Desktop/karhebti-android-gestionVoitures/app/src/main/java/com/example/karhebti_android/ui/screens/JitsiCallActivity.kt:26:12 Unresolved reference 'jitsi'.
+e: file:///C:/Users/Mosbeh%20Eya/Desktop/karhebti-android-gestionVoitures/app/src/main/java/com/example/karhebti_android/ui/screens/JitsiCallActivity.kt:27:12 Unresolved reference 'jitsi'.
+e: file:///C:/Users/Mosbeh%20Eya/Desktop/karhebti-android-gestionVoitures/app/src/main/java/com/example/karhebti_android/ui/screens/JitsiCallActivity.kt:28:12 Unresolved reference 'jitsi'.
+e: file:///C:/Users/Mosbeh%20Eya/Desktop/karhebti-android-gestionVoitures/app/src/main/java/com/example/karhebti_android/ui/screens/JitsiCallActivity.kt:64:34 Unresolved reference 'JitsiMeetConferenceOptions'.
+e: file:///C:/Users/Mosbeh%20Eya/Desktop/karhebti-android-gestionVoitures/app/src/main/java/com/example/karhebti_android/ui/screens/JitsiCallActivity.kt:68:13 Unresolved reference 'JitsiMeet'.
+e: file:///C:/Users/Mosbeh%20Eya/Desktop/karhebti-android-gestionVoitures/app/src/main/java/com/example/karhebti_android/ui/screens/JitsiCallActivity.kt:106:27 Unresolved reference 'JitsiMeetConferenceOptions'.
+e: file:///C:/Users/Mosbeh%20Eya/Desktop/karhebti-android-gestionVoitures/app/src/main/java/com/example/karhebti_android/ui/screens/JitsiCallActivity.kt:115:13 Unresolved reference 'JitsiMeetActivity'.
+
+> Task :app:compileDebugKotlin FAILED
+
+> Task :app:compileReleaseKotlin
+e: file:///C:/Users/Mosbeh%20Eya/Desktop/karhebti-android-gestionVoitures/app/src/main/java/com/example/karhebti_android/jitsi/JitsiCallActivity.kt:9:27 Unresolved reference 'app'.
+e: file:///C:/Users/Mosbeh%20Eya/Desktop/karhebti-android-gestionVoitures/app/src/main/java/com/example/karhebti_android/jitsi/JitsiCallActivity.kt:11:12 Unresolved reference 'jitsi'.
+e: file:///C:/Users/Mosbeh%20Eya/Desktop/karhebti-android-gestionVoitures/app/src/main/java/com/example/karhebti_android/jitsi/JitsiCallActivity.kt:12:12 Unresolved reference 'jitsi'.
+e: file:///C:/Users/Mosbeh%20Eya/Desktop/karhebti-android-gestionVoitures/app/src/main/java/com/example/karhebti_android/jitsi/JitsiCallActivity.kt:20:27 Unresolved reference 'AppCompatActivity'.
+e: file:///C:/Users/Mosbeh%20Eya/Desktop/karhebti-android-gestionVoitures/app/src/main/java/com/example/karhebti_android/jitsi/JitsiCallActivity.kt:26:38 Unresolved reference 'registerForActivityResult'.
+e: file:///C:/Users/Mosbeh%20Eya/Desktop/karhebti-android-gestionVoitures/app/src/main/java/com/example/karhebti_android/jitsi/JitsiCallActivity.kt:28:9 Cannot infer type for this parameter. Please specify it explicitly.
+e: file:///C:/Users/Mosbeh%20Eya/Desktop/karhebti-android-gestionVoitures/app/src/main/java/com/example/karhebti_android/jitsi/JitsiCallActivity.kt:29:60 Operator '==' cannot be applied to 'kotlin.text.MatchGroup?' and 'kotlin.Boolean'.
+e: file:///C:/Users/Mosbeh%20Eya/Desktop/karhebti-android-gestionVoitures/app/src/main/java/com/example/karhebti_android/jitsi/JitsiCallActivity.kt:31:13 Unresolved reference 'intent'.
+e: file:///C:/Users/Mosbeh%20Eya/Desktop/karhebti-android-gestionVoitures/app/src/main/java/com/example/karhebti_android/jitsi/JitsiCallActivity.kt:31:13 Argument type mismatch: actual type is 'R?', but 'K' was expected.
+e: file:///C:/Users/Mosbeh%20Eya/Desktop/karhebti-android-gestionVoitures/app/src/main/java/com/example/karhebti_android/jitsi/JitsiCallActivity.kt:31:44 Cannot infer type for this parameter. Please specify it explicitly.
+e: file:///C:/Users/Mosbeh%20Eya/Desktop/karhebti-android-gestionVoitures/app/src/main/java/com/example/karhebti_android/jitsi/JitsiCallActivity.kt:31:50 Cannot infer type for this parameter. Please specify it explicitly.
+e: file:///C:/Users/Mosbeh%20Eya/Desktop/karhebti-android-gestionVoitures/app/src/main/java/com/example/karhebti_android/jitsi/JitsiCallActivity.kt:33:19 None of the following candidates is applicable:
+static fun makeText(p0: Context!, p1: Int, p2: Int): Toast!
+static fun makeText(p0: Context!, p1: CharSequence!, p2: Int): Toast!
+e: file:///C:/Users/Mosbeh%20Eya/Desktop/karhebti-android-gestionVoitures/app/src/main/java/com/example/karhebti_android/jitsi/JitsiCallActivity.kt:33:106 Unresolved reference 'show'.
+e: file:///C:/Users/Mosbeh%20Eya/Desktop/karhebti-android-gestionVoitures/app/src/main/java/com/example/karhebti_android/jitsi/JitsiCallActivity.kt:34:13 Unresolved reference 'finish'.
+e: file:///C:/Users/Mosbeh%20Eya/Desktop/karhebti-android-gestionVoitures/app/src/main/java/com/example/karhebti_android/jitsi/JitsiCallActivity.kt:38:5 'onCreate' overrides nothing.
+e: file:///C:/Users/Mosbeh%20Eya/Desktop/karhebti-android-gestionVoitures/app/src/main/java/com/example/karhebti_android/jitsi/JitsiCallActivity.kt:39:9 Unresolved reference 'AppCompatActivity'.
+e: file:///C:/Users/Mosbeh%20Eya/Desktop/karhebti-android-gestionVoitures/app/src/main/java/com/example/karhebti_android/jitsi/JitsiCallActivity.kt:39:15 Unresolved reference 'onCreate'.
+e: file:///C:/Users/Mosbeh%20Eya/Desktop/karhebti-android-gestionVoitures/app/src/main/java/com/example/karhebti_android/jitsi/JitsiCallActivity.kt:41:20 Unresolved reference 'intent'.
+e: file:///C:/Users/Mosbeh%20Eya/Desktop/karhebti-android-gestionVoitures/app/src/main/java/com/example/karhebti_android/jitsi/JitsiCallActivity.kt:43:19 None of the following candidates is applicable:
+static fun makeText(p0: Context!, p1: Int, p2: Int): Toast!
+static fun makeText(p0: Context!, p1: CharSequence!, p2: Int): Toast!
+e: file:///C:/Users/Mosbeh%20Eya/Desktop/karhebti-android-gestionVoitures/app/src/main/java/com/example/karhebti_android/jitsi/JitsiCallActivity.kt:43:71 Unresolved reference 'show'.
+e: file:///C:/Users/Mosbeh%20Eya/Desktop/karhebti-android-gestionVoitures/app/src/main/java/com/example/karhebti_android/jitsi/JitsiCallActivity.kt:44:13 Unresolved reference 'finish'.
+e: file:///C:/Users/Mosbeh%20Eya/Desktop/karhebti-android-gestionVoitures/app/src/main/java/com/example/karhebti_android/jitsi/JitsiCallActivity.kt:49:47 Argument type mismatch: actual type is 'com.example.karhebti_android.jitsi.JitsiCallActivity', but '@NonNull() android.content.Context!' was expected.
+e: file:///C:/Users/Mosbeh%20Eya/Desktop/karhebti-android-gestionVoitures/app/src/main/java/com/example/karhebti_android/jitsi/JitsiCallActivity.kt:55:24 Argument type mismatch: actual type is 'kotlin.Any', but 'kotlin.String' was expected.
+e: file:///C:/Users/Mosbeh%20Eya/Desktop/karhebti-android-gestionVoitures/app/src/main/java/com/example/karhebti_android/jitsi/JitsiCallActivity.kt:61:27 Unresolved reference 'JitsiMeetConferenceOptions'.
+e: file:///C:/Users/Mosbeh%20Eya/Desktop/karhebti-android-gestionVoitures/app/src/main/java/com/example/karhebti_android/jitsi/JitsiCallActivity.kt:69:13 Unresolved reference 'JitsiMeetActivity'.
+e: file:///C:/Users/Mosbeh%20Eya/Desktop/karhebti-android-gestionVoitures/app/src/main/java/com/example/karhebti_android/jitsi/JitsiCallActivity.kt:71:13 Unresolved reference 'finish'.
+e: file:///C:/Users/Mosbeh%20Eya/Desktop/karhebti-android-gestionVoitures/app/src/main/java/com/example/karhebti_android/jitsi/JitsiCallActivity.kt:73:19 None of the following candidates is applicable:
+static fun makeText(p0: Context!, p1: Int, p2: Int): Toast!
+static fun makeText(p0: Context!, p1: CharSequence!, p2: Int): Toast!
+e: file:///C:/Users/Mosbeh%20Eya/Desktop/karhebti-android-gestionVoitures/app/src/main/java/com/example/karhebti_android/jitsi/JitsiCallActivity.kt:73:100 Unresolved reference 'show'.
+e: file:///C:/Users/Mosbeh%20Eya/Desktop/karhebti-android-gestionVoitures/app/src/main/java/com/example/karhebti_android/jitsi/JitsiCallActivity.kt:74:13 Unresolved reference 'finish'.
+e: file:///C:/Users/Mosbeh%20Eya/Desktop/karhebti-android-gestionVoitures/app/src/main/java/com/example/karhebti_android/navigation/NavGraph.kt:250:17 No parameter with name 'onBackClick' found.
+e: file:///C:/Users/Mosbeh%20Eya/Desktop/karhebti-android-gestionVoitures/app/src/main/java/com/example/karhebti_android/navigation/NavGraph.kt:250:17 No value passed for parameter 'items'.
+e: file:///C:/Users/Mosbeh%20Eya/Desktop/karhebti-android-gestionVoitures/app/src/main/java/com/example/karhebti_android/ui/screens/BreakdownHistoryScreen.kt:12:43 Cannot access 'val RowColumnParentData?.weight: Float': it is internal in file.
+e: file:///C:/Users/Mosbeh%20Eya/Desktop/karhebti-android-gestionVoitures/app/src/main/java/com/example/karhebti_android/ui/screens/BreakdownHistoryScreen.kt:21:35 Unresolved reference 'icons'.
+e: file:///C:/Users/Mosbeh%20Eya/Desktop/karhebti-android-gestionVoitures/app/src/main/java/com/example/karhebti_android/ui/screens/BreakdownHistoryScreen.kt:100:48 Unresolved reference 'Icons'.
+e: file:///C:/Users/Mosbeh%20Eya/Desktop/karhebti-android-gestionVoitures/app/src/main/java/com/example/karhebti_android/ui/screens/JitsiCallActivity.kt:26:12 Unresolved reference 'jitsi'.
+e: file:///C:/Users/Mosbeh%20Eya/Desktop/karhebti-android-gestionVoitures/app/src/main/java/com/example/karhebti_android/ui/screens/JitsiCallActivity.kt:27:12 Unresolved reference 'jitsi'.
+e: file:///C:/Users/Mosbeh%20Eya/Desktop/karhebti-android-gestionVoitures/app/src/main/java/com/example/karhebti_android/ui/screens/JitsiCallActivity.kt:28:12 Unresolved reference 'jitsi'.
+e: file:///C:/Users/Mosbeh%20Eya/Desktop/karhebti-android-gestionVoitures/app/src/main/java/com/example/karhebti_android/ui/screens/JitsiCallActivity.kt:64:34 Unresolved reference 'JitsiMeetConferenceOptions'.
+e: file:///C:/Users/Mosbeh%20Eya/Desktop/karhebti-android-gestionVoitures/app/src/main/java/com/example/karhebti_android/ui/screens/JitsiCallActivity.kt:68:13 Unresolved reference 'JitsiMeet'.
+e: file:///C:/Users/Mosbeh%20Eya/Desktop/karhebti-android-gestionVoitures/app/src/main/java/com/example/karhebti_android/ui/screens/JitsiCallActivity.kt:106:27 Unresolved reference 'JitsiMeetConferenceOptions'.
+e: file:///C:/Users/Mosbeh%20Eya/Desktop/karhebti-android-gestionVoitures/app/src/main/java/com/example/karhebti_android/ui/screens/JitsiCallActivity.kt:115:13 Unresolved reference 'JitsiMeetActivity'.
+
+> Task :app:compileReleaseKotlin FAILED
+> Task :app:mergeExtDexRelease
+> Task :app:mergeExtDexDebug
+
+FAILURE: Build completed with 2 failures.
+
+1: Task failed with an exception.
+-----------
+* What went wrong:
+Execution failed for task ':app:compileDebugKotlin'.
+> A failure occurred while executing org.jetbrains.kotlin.compilerRunner.GradleCompilerRunnerWithWorkers$GradleKotlinCompilerWorkAction
+   > Compilation error. See log for more details
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+==============================================================================
+
+2: Task failed with an exception.
+-----------
+* What went wrong:
+Execution failed for task ':app:compileReleaseKotlin'.
+> A failure occurred while executing org.jetbrains.kotlin.compilerRunner.GradleCompilerRunnerWithWorkers$GradleKotlinCompilerWorkAction
+   > Compilation error. See log for more details
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+==============================================================================
+
+BUILD FAILED in 53s
+73 actionable tasks: 72 executed, 1 up-to-date

@@ -1,0 +1,254 @@
+================================================================================
+BACKEND AUTHENTICATION FIX REQUIRED - 401 UNAUTHORIZED ERROR
+================================================================================
+
+DATE: November 10, 2025
+ISSUE: Backend rejecting valid JWT tokens with 401 Unauthorized
+
+================================================================================
+PROBLEM DESCRIPTION
+================================================================================
+
+The Android application is successfully sending JWT tokens in the Authorization
+header to all protected endpoints, but the backend is returning 401 Unauthorized
+for ALL requests to:
+  - GET /cars
+  - GET /maintenances
+  - GET /garages
+  - GET /documents
+
+The Android app authentication flow is working CORRECTLY:
+  ✓ User logs in successfully via POST /auth/login
+  ✓ Backend returns access_token in response
+  ✓ Token is saved to SharedPreferences
+  ✓ Token is retrieved for each API request
+  ✓ Authorization header is added: "Bearer {token}"
+  ✓ Token format is correct and follows JWT standard
+
+================================================================================
+EVIDENCE FROM ANDROID LOGS
+================================================================================
+
+REQUEST SENT BY ANDROID APP:
+----------------------------
+GET http://10.0.2.2:3000/cars
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImF6aXp3aGliaUBlc3ByaXQudG4iLCJzdWIiOiI2OTBhNTY2MjlkMDc1YWI4MzE3MGI4MGYiLCJyb2xlIjoidXRpbGlzYXRldXIiLCJpYXQiOjE3NjI3ODU2NDMsImV4cCI6MTc2Mjg3MjA0M30.ch7oOXPN-5okC5MxZMUemRB9BM20JqVQ09nLSjAoJSc
+Content-Type: application/json
+
+BACKEND RESPONSE:
+-----------------
+HTTP/1.1 401 Unauthorized
+X-Powered-By: Express
+Access-Control-Allow-Origin: *
+Content-Type: application/json; charset=utf-8
+Content-Length: 43
+
+{"message":"Unauthorized","statusCode":401}
+
+================================================================================
+JWT TOKEN DETAILS
+================================================================================
+
+FULL TOKEN:
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImF6aXp3aGliaUBlc3ByaXQudG4iLCJzdWIiOiI2OTBhNTY2MjlkMDc1YWI4MzE3MGI4MGYiLCJyb2xlIjoidXRpbGlzYXRldXIiLCJpYXQiOjE3NjI3ODU2NDMsImV4cCI6MTc2Mjg3MjA0M30.ch7oOXPN-5okC5MxZMUemRB9BM20JqVQ09nLSjAoJSc
+
+DECODED HEADER:
+{
+  "alg": "HS256",
+  "typ": "JWT"
+}
+
+DECODED PAYLOAD:
+{
+  "email": "azizwhibi@esprit.tn",
+  "sub": "690a56629d075ab83170b80f",
+  "role": "utilisateur",
+  "iat": 1762785643,
+  "exp": 1762872043
+}
+
+TOKEN ANALYSIS:
+- User Email: azizwhibi@esprit.tn
+- User ID: 690a56629d075ab83170b80f
+- User Role: utilisateur
+- Issued At: November 10, 2025 (timestamp: 1762785643)
+- Expires: November 11, 2025 (timestamp: 1762872043)
+- Status: NOT EXPIRED (valid for 24 hours)
+- Algorithm: HS256 (HMAC SHA-256)
+- Format: Valid JWT structure
+
+================================================================================
+ROOT CAUSE ANALYSIS
+================================================================================
+
+The token appears valid and is NOT expired. The issue is on the BACKEND side.
+
+The backend is receiving the token correctly but failing to validate it.
+
+POSSIBLE CAUSES:
+
+1. JWT_SECRET MISMATCH
+   - The secret used to SIGN the token during login differs from the secret
+     used to VERIFY the token in the auth guard
+   - Check if JWT_SECRET in .env matches across all auth files
+   - Verify environment variables are loaded properly
+
+2. AUTH GUARD NOT EXTRACTING TOKEN CORRECTLY
+   - The guard might not be parsing "Bearer {token}" correctly
+   - Should use: request.headers.authorization?.replace('Bearer ', '')
+   - Check if the guard is receiving the header at all
+
+3. TOKEN VERIFICATION FAILING SILENTLY
+   - jwt.verify() might be throwing an error that's not logged
+   - Signature validation could be failing due to wrong secret
+   - JWT library version incompatibility
+
+4. USER LOOKUP FAILING
+   - User with ID "690a56629d075ab83170b80f" might not exist in database
+   - Database query might be failing silently
+   - User ID format mismatch (string vs ObjectId)
+
+5. DATABASE CONNECTION ISSUE
+   - MongoDB connection might be down
+   - User collection might not be accessible
+   - Connection timeout or authentication issue
+
+================================================================================
+ACTION ITEMS FOR BACKEND DEVELOPER
+================================================================================
+
+STEP 1: ADD LOGGING TO AUTH GUARD
+----------------------------------
+Add console.log statements to see what's happening:
+
+```typescript
+// In your auth guard or JWT strategy
+console.log('=== AUTH GUARD DEBUG ===');
+console.log('Authorization header:', request.headers.authorization);
+
+const token = request.headers.authorization?.replace('Bearer ', '');
+console.log('Extracted token:', token);
+
+try {
+  const decoded = jwt.verify(token, process.env.JWT_SECRET);
+  console.log('Token decoded successfully:', decoded);
+} catch (error) {
+  console.error('Token verification failed:', error.message);
+  throw new UnauthorizedException('Invalid token');
+}
+```
+
+STEP 2: VERIFY JWT_SECRET CONSISTENCY
+--------------------------------------
+1. Check .env file has JWT_SECRET defined
+2. Verify same secret is used in:
+   - auth.service.ts (for signing tokens on login)
+   - jwt.strategy.ts (for verifying tokens)
+   - Any auth guard or middleware
+3. Restart the backend after any .env changes
+
+STEP 3: CHECK USER EXISTS IN DATABASE
+--------------------------------------
+```typescript
+const userId = decoded.sub; // "690a56629d075ab83170b80f"
+console.log('Looking up user with ID:', userId);
+
+const user = await this.userModel.findById(userId);
+console.log('User found:', user ? 'YES' : 'NO');
+
+if (!user) {
+  throw new UnauthorizedException('User not found');
+}
+```
+
+STEP 4: VERIFY AUTH GUARD CONFIGURATION
+----------------------------------------
+Ensure protected routes are using the guard correctly:
+
+```typescript
+@UseGuards(JwtAuthGuard)
+@Get('cars')
+async getMyCars(@Request() req) {
+  console.log('Authenticated user:', req.user);
+  // ...
+}
+```
+
+STEP 5: TEST WITH EXACT TOKEN
+------------------------------
+Use this exact token for testing (valid for 24 hours from Nov 10, 2025):
+
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImF6aXp3aGliaUBlc3ByaXQudG4iLCJzdWIiOiI2OTBhNTY2MjlkMDc1YWI4MzE3MGI4MGYiLCJyb2xlIjoidXRpbGlzYXRldXIiLCJpYXQiOjE3NjI3ODU2NDMsImV4cCI6MTc2Mjg3MjA0M30.ch7oOXPN-5okC5MxZMUemRB9BM20JqVQ09nLSjAoJSc
+
+Test with curl:
+```bash
+curl -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImF6aXp3aGliaUBlc3ByaXQudG4iLCJzdWIiOiI2OTBhNTY2MjlkMDc1YWI4MzE3MGI4MGYiLCJyb2xlIjoidXRpbGlzYXRldXIiLCJpYXQiOjE3NjI3ODU2NDMsImV4cCI6MTc2Mjg3MjA0M30.ch7oOXPN-5okC5MxZMUemRB9BM20JqVQ09nLSjAoJSc" http://localhost:3000/cars
+```
+
+================================================================================
+TEMPORARY WORKAROUND (DEVELOPMENT ONLY)
+================================================================================
+
+To verify Android app is working, temporarily bypass authentication:
+
+Option 1 - Comment out guard on one endpoint:
+```typescript
+// @UseGuards(JwtAuthGuard)  // TEMPORARY - REMOVE BEFORE PRODUCTION
+@Get('cars')
+async getMyCars() {
+  return await this.carService.findAll();
+}
+```
+
+Option 2 - Create test endpoint:
+```typescript
+@Get('cars/test')
+async getCarsTest() {
+  return await this.carService.findAll();
+}
+```
+
+⚠️ WARNING: Remove these workarounds before deploying to production!
+
+================================================================================
+EXPECTED BACKEND LOGS TO SHARE
+================================================================================
+
+After adding logging, please share:
+
+1. What token the auth guard receives
+2. Any errors from jwt.verify()
+3. Whether user lookup succeeds
+4. Full error stack trace if any exception occurs
+5. Contents of process.env.JWT_SECRET (first 5 characters only for security)
+
+================================================================================
+VERIFICATION CHECKLIST
+================================================================================
+
+☐ JWT_SECRET is defined in .env
+☐ JWT_SECRET is the same in all auth files
+☐ Environment variables are loaded (using dotenv or similar)
+☐ Auth guard extracts token from "Bearer {token}" format
+☐ jwt.verify() uses correct secret
+☐ User with ID "690a56629d075ab83170b80f" exists in database
+☐ User lookup doesn't throw errors
+☐ MongoDB connection is working
+☐ Auth guard is properly configured on routes
+☐ Token is not in a blacklist/revocation list
+
+================================================================================
+CONTACT INFORMATION
+================================================================================
+
+Android Developer: Ready to test immediately after backend fix
+Test User: azizwhibi@esprit.tn
+Test User ID: 690a56629d075ab83170b80f
+
+Once the backend issue is fixed, the Android app will work immediately without
+any code changes, as it is already correctly sending the authentication token.
+
+================================================================================
+END OF REPORT
+================================================================================
+
