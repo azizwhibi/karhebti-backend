@@ -26,14 +26,14 @@ export class NotificationsService {
     try {
       initializeFirebase();
       this.firebaseMessaging = getFirebaseMessaging();
-      this.logger.log('✅ Firebase initialisé avec succès');
+      this.logger.log('[translate:✅ Firebase initialisé avec succès]');
     } catch (error) {
-      this.logger.warn('⚠️  Firebase non disponible:', error);
+      this.logger.warn('[translate:⚠️ Firebase non disponible:]', error);
     }
   }
 
   /**
-   * Envoyer une notification via Firebase Cloud Messaging
+   * [translate:Envoyer une notification via Firebase Cloud Messaging]
    */
   async sendFirebaseNotification(
     deviceToken: string,
@@ -73,16 +73,17 @@ export class NotificationsService {
         },
       });
 
-      this.logger.log(`✅ Notification Firebase envoyée: ${response}`);
+      this.logger.log(`[translate:✅ Notification Firebase envoyée:] ${response}`);
       return response;
     } catch (error) {
-      this.logger.error(`❌ Erreur lors de l'envoi Firebase: ${error.message}`);
+      this.logger.error(`[translate:❌ Erreur lors de l'envoi Firebase:] ${error.message}`);
       throw error;
     }
   }
 
   /**
-   * Envoyer une notification complète (enregistrement + envoi Firebase)
+   * [translate:Envoyer une notification complète (enregistrement + envoi Firebase)]
+   * ✅ FIX: Automatically map titre → title to satisfy schema validation
    */
   async sendNotification(
     sendNotificationDto: SendNotificationDto,
@@ -90,34 +91,46 @@ export class NotificationsService {
     const {
       userId,
       titre,
+      title,
       message,
       type,
       deviceToken,
       documentId,
       maintenanceId,
+      reservationId,
       data,
     } = sendNotificationDto;
 
-    // Créer l'enregistrement de notification
+    // ✅ FIX: Use title if provided, otherwise fallback to titre
+    // This ensures the required 'title' field is always present
+    const finalTitle = title || titre;
+
+    if (!finalTitle) {
+      throw new Error('[translate:Le champ title ou titre est requis]');
+    }
+
+    // [translate:Créer l'enregistrement de notification]
     const notificationRecord = await this.notificationModel.create({
       userId: new Types.ObjectId(userId),
       type,
-      titre,
+      title: finalTitle,        // ✅ Required field
+      titre: titre || finalTitle, // ✅ Optional French field
       message,
       deviceToken,
       documentId: documentId ? new Types.ObjectId(documentId) : undefined,
       maintenanceId: maintenanceId ? new Types.ObjectId(maintenanceId) : undefined,
+      reservationId: reservationId ? new Types.ObjectId(reservationId) : undefined,
       data,
       status: NotificationStatus.PENDING,
     });
 
     try {
-      // Envoyer via Firebase
+      // [translate:Envoyer via Firebase]
       if (deviceToken) {
         try {
           const messageId = await this.sendFirebaseNotification(
             deviceToken,
-            titre,
+            finalTitle,
             message,
             data,
           );
@@ -163,7 +176,7 @@ export class NotificationsService {
   }
 
   /**
-   * Mettre à jour le device token d'un utilisateur
+   * [translate:Mettre à jour le device token d'un utilisateur]
    */
   async updateDeviceToken(
     userId: string,
@@ -171,11 +184,11 @@ export class NotificationsService {
   ): Promise<void> {
     const { deviceToken } = updateDeviceTokenDto;
     await this.usersService.updateDeviceToken(userId, deviceToken);
-    this.logger.log(`Device token mis à jour pour l'utilisateur: ${userId}`);
+    this.logger.log(`[translate:Device token mis à jour pour l'utilisateur:] ${userId}`);
   }
 
   /**
-   * Récupérer les notifications d'un utilisateur
+   * [translate:Récupérer les notifications d'un utilisateur]
    */
   async getUserNotifications(
     userId: string,
@@ -197,14 +210,14 @@ export class NotificationsService {
   }
 
   /**
-   * Marquer une notification comme lue
+   * [translate:Marquer une notification comme lue]
    */
   async markAsRead(notificationId: string, userId?: string): Promise<Notification | null> {
     const query: any = { _id: new Types.ObjectId(notificationId) };
     if (userId) {
       query.userId = new Types.ObjectId(userId);
     }
-    
+
     return this.notificationModel.findOneAndUpdate(
       query,
       {
@@ -217,7 +230,7 @@ export class NotificationsService {
   }
 
   /**
-   * Marquer toutes les notifications d'un utilisateur comme lues
+   * [translate:Marquer toutes les notifications d'un utilisateur comme lues]
    */
   async markAllAsRead(userId: string): Promise<any> {
     return this.notificationModel.updateMany(
@@ -234,7 +247,7 @@ export class NotificationsService {
   }
 
   /**
-   * Récupérer les notifications non lues
+   * [translate:Récupérer les notifications non lues]
    */
   async getUnreadNotifications(userId: string): Promise<Notification[]> {
     return this.notificationModel
@@ -247,7 +260,7 @@ export class NotificationsService {
   }
 
   /**
-   * Compter les notifications non lues
+   * [translate:Compter les notifications non lues]
    */
   async countUnreadNotifications(userId: string): Promise<number> {
     return this.notificationModel.countDocuments({
@@ -257,7 +270,7 @@ export class NotificationsService {
   }
 
   /**
-   * Supprimer une notification
+   * [translate:Supprimer une notification]
    */
   async deleteNotification(notificationId: string): Promise<any> {
     return this.notificationModel.findByIdAndDelete(
@@ -266,11 +279,119 @@ export class NotificationsService {
   }
 
   /**
-   * Supprimer toutes les notifications d'un utilisateur
+   * [translate:Supprimer toutes les notifications d'un utilisateur]
    */
   async deleteAllUserNotifications(userId: string): Promise<any> {
     return this.notificationModel.deleteMany({
       userId: new Types.ObjectId(userId),
     });
+  }
+
+  async sendReservationCancelledNotification(
+    userId: string,
+    reservationId: string,
+    garageName: string,
+    date: Date,
+    heureDebut: string,
+    heureFin: string,
+  ): Promise<void> {
+    try {
+      const user = await this.usersService.findById(userId);
+  
+      if (!user) {
+        this.logger.warn(`User ${userId} not found for notification`);
+        return;
+      }
+  
+      const formattedDate = new Date(date).toLocaleDateString('fr-FR', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      });
+  
+      const titre = '🚫 Réservation annulée';
+      const message =
+        `Votre réservation chez ${garageName} le ${formattedDate} de ${heureDebut} à ${heureFin} ` +
+        `a été annulée automatiquement, car aucun créneau de réparation n’était disponible à cette heure. ` +
+        `Veuillez choisir une autre date ou un autre horaire.`;
+  
+      await this.sendNotification({
+        userId,
+        type: NotificationType.RESERVATION_CANCELLED,
+        titre,
+        title: titre,
+        message,
+        deviceToken: user.deviceToken,
+        reservationId,
+        data: {
+          reservationId,
+          garageName,
+          date: date.toISOString(),
+          heureDebut,
+          heureFin,
+          reason: 'no_repair_bay_available',
+          action: 'reservation_cancelled',
+        },
+      });
+  
+      this.logger.log(`✅ Notification d'annulation envoyée à l'utilisateur ${userId}`);
+    } catch (error) {
+      this.logger.error(`❌ Erreur lors de l'envoi de notification d'annulation: ${error.message}`);
+    }
+  }
+  
+
+  /**
+   * [translate:Envoyer une notification de réservation confirmée]
+   */
+  async sendReservationConfirmedNotification(
+    userId: string,
+    reservationId: string,
+    garageName: string,
+    date: Date,
+    heureDebut: string,
+    heureFin: string,
+  ): Promise<void> {
+    try {
+      const user = await this.usersService.findById(userId);
+
+      if (!user) {
+        this.logger.warn(`User ${userId} not found for notification`);
+        return;
+      }
+
+      const formattedDate = new Date(date).toLocaleDateString('fr-FR', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+
+      const titre = '[translate:✅ Réservation confirmée]';
+      const message = `[translate:Votre réservation chez] ${garageName} [translate:le] ${formattedDate} [translate:de] ${heureDebut} [translate:à] ${heureFin} [translate:a été confirmée !]`;
+
+      await this.sendNotification({
+        userId,
+        type: NotificationType.RESERVATION_CONFIRMED,
+        titre,
+        title: titre, // ✅ Added for compatibility
+        message,
+        deviceToken: user.deviceToken,
+        reservationId,
+        data: {
+          reservationId,
+          garageName,
+          date: date.toISOString(),
+          heureDebut,
+          heureFin,
+          action: 'reservation_confirmed',
+        },
+      });
+
+      this.logger.log(`[translate:✅ Notification de confirmation envoyée à l'utilisateur] ${userId}`);
+    } catch (error) {
+      this.logger.error(`[translate:❌ Erreur lors de l'envoi de notification de confirmation:] ${error.message}`);
+    }
   }
 }

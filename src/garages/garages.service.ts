@@ -7,6 +7,8 @@ import { UpdateGarageDto } from './dto/update-garage.dto';
 import { Service, ServiceDocument } from '../services/schemas/service.schema';
 import { OsmService } from './osm.service';
 import { RepairBaysService } from '../repair-bays/repair-bays.service';
+import { ReservationsService } from '../reservation/reservations.service';  // ✅ ADDED
+import { NotificationsService } from '../notifications/notifications.service';  // ✅ ADDED
 
 @Injectable()
 export class GaragesService {
@@ -15,13 +17,14 @@ export class GaragesService {
     @InjectModel(Service.name) private serviceModel: Model<ServiceDocument>,
     private readonly osmService: OsmService,
     private readonly repairBaysService: RepairBaysService,
+    private readonly reservationsService: ReservationsService,  // ✅ ADDED
+    private readonly notificationsService: NotificationsService,  // ✅ ADDED
   ) {}
 
   async create(
     createDto: CreateGarageDto,
     numberOfBays: number = 1
   ): Promise<{ garage: Garage; repairBays: any[] }> {
-    // Si l'utilisateur n'envoie PAS latitude/longitude → géocodage via OSM
     if (!createDto.latitude || !createDto.longitude) {
       const results = await this.osmService.searchAddress(createDto.adresse);
   
@@ -34,20 +37,15 @@ export class GaragesService {
       createDto.longitude = parseFloat(bestMatch.lon);
     }
   
-    // ✅ Ajouter numberOfBays au DTO avant la création
     const garageData = {
       ...createDto,
-      numberOfBays: numberOfBays // ✅ Sauvegarder dans la base de données
+      numberOfBays: numberOfBays
     };
   
-    // Créer le garage
     const created = new this.garageModel(garageData);
     const savedGarage = await created.save();
-  
-    // Cast _id en string
     const garageId = (savedGarage._id as any).toString();
   
-    // Créer automatiquement les créneaux de réparation
     const repairBays = await this.repairBaysService.createMultipleBaysForGarage(
       garageId,
       numberOfBays,
@@ -68,9 +66,58 @@ export class GaragesService {
     return garage;
   }
 
+  // ✅ UPDATED: Handle numberOfBays decrease
   async update(id: string, updateDto: UpdateGarageDto): Promise<Garage> {
+    // Get current garage to compare numberOfBays
+    const currentGarage = await this.garageModel.findById(id).exec();
+    if (!currentGarage) throw new NotFoundException('Garage non trouvé');
+
+    const currentNumberOfBays = currentGarage.numberOfBays || 1;
+    const newNumberOfBays = updateDto.numberOfBays;
+
+    // ✅ If numberOfBays is being decreased, delete excess bays
+    if (newNumberOfBays !== undefined && newNumberOfBays < currentNumberOfBays) {
+      console.log(`⚠️ Decreasing repair bays from ${currentNumberOfBays} to ${newNumberOfBays}`);
+      
+      const baysToDelete = currentNumberOfBays - newNumberOfBays;
+      console.log(`🗑️ Deleting ${baysToDelete} repair bay(s) with bayNumber > ${newNumberOfBays}`);
+
+      // Delete bays with bayNumber > newNumberOfBays
+      await this.repairBaysService.deleteBaysByNumberRange(
+        id, 
+        newNumberOfBays + 1, 
+        currentNumberOfBays
+      );
+
+      console.log(`✅ Excess repair bays deleted successfully`);
+    }
+
+    // ✅ If numberOfBays is being increased, create new bays
+    if (newNumberOfBays !== undefined && newNumberOfBays > currentNumberOfBays) {
+      console.log(`➕ Increasing repair bays from ${currentNumberOfBays} to ${newNumberOfBays}`);
+      
+      const baysToAdd = newNumberOfBays - currentNumberOfBays;
+      console.log(`✅ Creating ${baysToAdd} new repair bay(s)`);
+
+      // Create new bays starting from currentNumberOfBays + 1
+      for (let i = currentNumberOfBays + 1; i <= newNumberOfBays; i++) {
+        await this.repairBaysService.createRepairBay(
+          id,
+          i,
+          `Créneau ${i}`,
+          updateDto.heureOuverture || currentGarage.heureOuverture || '08:00',
+          updateDto.heureFermeture || currentGarage.heureFermeture || '18:00',
+          true
+        );
+      }
+
+      console.log(`✅ New repair bays created successfully`);
+    }
+
+    // Update the garage
     const updated = await this.garageModel.findByIdAndUpdate(id, updateDto, { new: true }).exec();
     if (!updated) throw new NotFoundException('Garage non trouvé');
+    
     return updated;
   }
 

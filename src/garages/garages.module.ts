@@ -10,12 +10,13 @@ import { OsmService } from './osm.service';
 import { HttpModule } from '@nestjs/axios';
 import { OsmController } from './osm.controller';
 import { ReservationsModule } from 'src/reservation/reservations.module';
-
+import { NotificationsModule } from '../notifications/notifications.module';  // ✅ ADDED
 @Module({
   imports: [
     ServicesModule,
     RepairBaysModule,
-    ReservationsModule, // ✅ Ajouter
+    ReservationsModule,
+    NotificationsModule, // ✅ Ajouter
     MongooseModule.forFeature([
       { name: Garage.name, schema: GarageSchema },
       { name: Service.name, schema: ServiceSchema }
