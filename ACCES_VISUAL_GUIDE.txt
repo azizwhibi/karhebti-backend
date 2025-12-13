@@ -1,0 +1,248 @@
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                                                                              ║
+║                  🚨 ACCÈS GARAGE BREAKDOWN DETAILS SCREEN                    ║
+║                                                                              ║
+║                            GUIDE ULTRA-VISUEL                                ║
+║                                                                              ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                              📱 ÉTAPE 1 : LOGIN                              │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+    ┌────────────────────────────────┐
+    │      🔐 KARHEBTI LOGIN        │
+    ├────────────────────────────────┤
+    │                                │
+    │  Email:                        │
+    │  ┌──────────────────────────┐ │
+    │  │ prop.garage@example.com  │ │
+    │  └──────────────────────────┘ │
+    │                                │
+    │  Mot de passe:                 │
+    │  ┌──────────────────────────┐ │
+    │  │ **********               │ │
+    │  └──────────────────────────┘ │
+    │                                │
+    │     ┌──────────────────┐      │
+    │     │  SE CONNECTER    │      │
+    │     └──────────────────┘      │
+    │                                │
+    └────────────────────────────────┘
+
+                    ↓ CLIQUEZ "SE CONNECTER"
+
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                        📱 ÉTAPE 2 : HOME SCREEN                              │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+    ┌────────────────────────────────────────┐
+    │   🏠 KARHEBTI        [👤]    [⚙️]     │
+    ├────────────────────────────────────────┤
+    │                                        │
+    │  Bonjour, Garage Owner 👋              │
+    │                                        │
+    │  ┌──────────┐  ┌──────────┐           │
+    │  │Véhicules │  │Entretien │           │
+    │  └──────────┘  └──────────┘           │
+    │                                        │
+    │  ┌──────────┐  ┌──────────┐           │
+    │  │Documents │  │ Garages  │           │
+    │  └──────────┘  └──────────┘           │
+    │                                        │
+    │  ... scrollez vers le bas ...         │
+    │         ↓ ↓ ↓                         │
+    │                                        │
+    └────────────────────────────────────────┘
+
+                    ↓ SCROLLEZ VERS LE BAS
+
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                    📱 ÉTAPE 3 : SECTION SOS (EN BAS)                         │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+    ┌────────────────────────────────────────┐
+    │                                        │
+    │  🚗 Car Marketplace                    │
+    │  ┌──────────┐  ┌──────────┐           │
+    │  │Browse Cars│  │Listings │           │
+    │  └──────────┘  └──────────┘           │
+    │                                        │
+    │  🚨 SOS Management    ← VOICI !        │
+    │  ┌──────────────────────────────────┐ │
+    │  │                                  │ │
+    │  │  ⚠️    🚨 Test SOS Details      │ │  ← BOUTON ROUGE
+    │  │                                  │ │
+    │  │  View test breakdown request     │ │
+    │  │                              →   │ │
+    │  │                                  │ │
+    │  └──────────────────────────────────┘ │
+    │              ↑                         │
+    │         CLIQUEZ ICI !                  │
+    │                                        │
+    └────────────────────────────────────────┘
+
+                    ↓ CLIQUEZ SUR LE BOUTON ROUGE
+
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│              📱 ÉTAPE 4 : GARAGE BREAKDOWN DETAILS SCREEN                    │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+    ┌────────────────────────────────────────┐
+    │  🚨 Demande SOS            [←]         │
+    ├────────────────────────────────────────┤
+    │                                        │
+    │  ╔════════════════════════════════╗   │
+    │  ║  ⚠️ DEMANDE URGENTE            ║   │
+    │  ║  Un client a besoin            ║   │
+    │  ║  d'assistance immédiate        ║   │
+    │  ╚════════════════════════════════╝   │
+    │                                        │
+    │  ╔════════════════════════════════╗   │
+    │  ║  🛞 Type de panne              ║   │
+    │  ║  PNEU                          ║   │
+    │  ╚════════════════════════════════╝   │
+    │                                        │
+    │  ╔════════════════════════════════╗   │
+    │  ║  📝 Description                ║   │
+    │  ║  Pneu crevé sur autoroute      ║   │
+    │  ╚════════════════════════════════╝   │
+    │                                        │
+    │  ╔════════════╦═══════════════════╗   │
+    │  ║ 📏 5.2 km  ║ ⏱️ 15 minutes     ║   │
+    │  ║ Distance   ║ Temps estimé      ║   │
+    │  ╚════════════╩═══════════════════╝   │
+    │                                        │
+    │  ╔════════════════════════════════╗   │
+    │  ║  📍 Position du client         ║   │
+    │  ║  ┌──────────────────────────┐  ║   │
+    │  ║  │                          │  ║   │
+    │  ║  │   [Carte Interactive]    │  ║   │
+    │  ║  │         📌               │  ║   │
+    │  ║  │                          │  ║   │
+    │  ║  └──────────────────────────┘  ║   │
+    │  ╚════════════════════════════════╝   │
+    │                                        │
+    │  ╔════════════════════════════════╗   │
+    │  ║  👤 Informations client        ║   │
+    │  ║  📞 +216 XX XXX XXX  [📞Call] ║   │
+    │  ║  📍 36.8065, 10.1815          ║   │
+    │  ╚════════════════════════════════╝   │
+    │                                        │
+    │  ┌────────────┐   ┌───────────────┐  │
+    │  │ ❌ Refuser │   │ ✅ Accepter   │  │
+    │  └────────────┘   └───────────────┘  │
+    │                                        │
+    └────────────────────────────────────────┘
+
+                    ↓ TESTEZ LES BOUTONS
+
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                            ✅ SUCCÈS !                                       ║
+║                                                                              ║
+║        Vous avez maintenant accès à GarageBreakdownDetailsScreen !          ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                          📋 CHECKLIST RAPIDE                                 │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+    Avant de commencer :
+
+    ☐ Compte garage_owner créé (role = 'garage_owner')
+    ☐ Breakdown de test dans la DB (ID = 1)
+    ☐ App compilée et installée
+
+    Pour tester :
+
+    ☐ Login comme prop.garage@example.com
+    ☐ Home Screen chargé
+    ☐ Scroll vers le bas
+    ☐ Trouvé section "🚨 SOS Management"
+    ☐ Bouton rouge visible
+    ☐ Click sur "🚨 Test SOS Details"
+    ☐ Écran GarageBreakdownDetails s'ouvre
+    ☐ Informations affichées correctement
+    ☐ Bouton "Accepter" testé
+    ☐ Bouton "Refuser" testé
+
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                        🔧 CONFIGURATION RAPIDE                               │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+    1. Vérifier le rôle de l'utilisateur :
+
+       SELECT email, role FROM users
+       WHERE email = 'prop.garage@example.com';
+
+       → Doit afficher : role = 'garage_owner'
+
+    2. Créer un breakdown de test :
+
+       INSERT INTO breakdowns (userId, type, description, latitude, longitude, status)
+       VALUES (1, 'PNEU', 'Test', 36.8065, 10.1815, 'PENDING');
+
+    3. Compiler et installer :
+
+       ./gradlew assembleDebug
+       adb install -r app/build/outputs/apk/debug/app-debug.apk
+
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                           🎯 RÉSUMÉ ULTRA-RAPIDE                             │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+    LOGIN → HOME → SCROLL → CLICK ROUGE → ✅ ÉCRAN S'OUVRE
+
+    Temps total : < 10 secondes
+    Difficulté : ⭐☆☆☆☆ (Très facile)
+
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                              🆘 DÉPANNAGE                                    │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+    ❌ Problème : Le bouton n'apparaît pas
+       ✅ Solution : Vérifiez que role = 'garage_owner'
+
+    ❌ Problème : Erreur "Breakdown not found"
+       ✅ Solution : Créez un breakdown avec ID = 1
+
+    ❌ Problème : L'écran est vide
+       ✅ Solution : Vérifiez les données du breakdown
+
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                          📚 DOCUMENTATION                                    │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+    Guide Complet :
+    → COMMENT_ACCEDER_GARAGE_BREAKDOWN_SCREEN.md
+
+    Guide Rapide :
+    → ACCES_RAPIDE_GARAGE_SOS.md
+
+    Ce Fichier :
+    → ACCES_VISUAL_GUIDE.txt
+
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                                                                              ║
+║                          🎉 BONNE CHANCE !                                   ║
+║                                                                              ║
+║              Tout est prêt pour accéder à l'écran SOS Garage !              ║
+║                                                                              ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+
+Date : 6 Décembre 2025
+Status : ✅ Fonctionnel
+Version : 1.0
+

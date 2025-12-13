@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "877845049082",
+    "project_id": "karhebti-android",
+    "storage_bucket": "karhebti-android.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:877845049082:android:7910befdd71cc42cb82343",
+        "android_client_info": {
+          "package_name": "com.example.karhebti_android"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAR-quA40ulk1NfbiRis0S_YoKctb--LRo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
