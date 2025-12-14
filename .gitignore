@@ -43,6 +43,10 @@ lerna-debug.log*
 .env.production.local
 .env.local
 
+# History files (contains sensitive data)
+.history/
+**/.history/
+
 # temp directory
 .temp
 .tmp
