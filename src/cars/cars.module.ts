@@ -4,6 +4,7 @@ import { CarsService } from './cars.service';
 import { CarsController } from './cars.controller';
 import { Car, CarSchema } from './schemas/car.schema';
 import { UploadService } from '../common/services/upload.service';
+import { SupabaseService } from '../common/services/supabase.service';
 import { Swipe, SwipeSchema } from '../swipes/schemas/swipe.schema';
 import { AiModule } from '../ai/ai.module';
 
@@ -16,7 +17,7 @@ import { AiModule } from '../ai/ai.module';
     forwardRef(() => AiModule),
   ],
   controllers: [CarsController],
-  providers: [CarsService, UploadService],
-  exports: [CarsService, UploadService],
+  providers: [CarsService, UploadService, SupabaseService],
+  exports: [CarsService, UploadService, SupabaseService],
 })
 export class CarsModule {}

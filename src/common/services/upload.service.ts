@@ -1,7 +1,6 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import sharp from 'sharp';
-import * as fs from 'fs/promises';
-import * as path from 'path';
+import { SupabaseService } from './supabase.service';
 
 export interface ImageMetadata {
   width: number;
@@ -19,23 +18,12 @@ export interface ProcessedImage {
 
 @Injectable()
 export class UploadService {
-  private readonly uploadDir = path.join(process.cwd(), 'uploads', 'cars');
   private readonly maxWidth = 1600;
   private readonly quality = 80;
   private readonly allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp'];
   private readonly maxFileSize = 5 * 1024 * 1024; // 5MB
 
-  constructor() {
-    this.ensureUploadDir();
-  }
-
-  private async ensureUploadDir() {
-    try {
-      await fs.mkdir(this.uploadDir, { recursive: true });
-    } catch (error) {
-      console.error('Failed to create upload directory:', error);
-    }
-  }
+  constructor(private readonly supabaseService: SupabaseService) {}
 
   validateFile(file: Express.Multer.File): void {
     if (!file) {
@@ -63,7 +51,6 @@ export class UploadService {
 
     const timestamp = Date.now();
     const filename = `car-${carId}-${timestamp}.webp`;
-    const filepath = path.join(this.uploadDir, filename);
 
     try {
       // Process image with Sharp
@@ -78,21 +65,22 @@ export class UploadService {
       // Get metadata
       const metadata = await sharp(processedBuffer).metadata();
 
-      // Save to disk
-      await fs.writeFile(filepath, processedBuffer);
-
-      // Get file size
-      const stats = await fs.stat(filepath);
+      // Upload to Supabase Storage
+      const publicUrl = await this.supabaseService.uploadFile(
+        processedBuffer,
+        filename,
+        'image/webp',
+      );
 
       return {
         filename,
-        path: filepath,
-        url: `/uploads/cars/${filename}`,
+        path: filename, // Store just the filename for future reference
+        url: publicUrl, // Full Supabase public URL
         metadata: {
           width: metadata.width || 0,
           height: metadata.height || 0,
           format: 'webp',
-          size: stats.size,
+          size: processedBuffer.length,
         },
       };
     } catch (error) {
@@ -105,12 +93,10 @@ export class UploadService {
     if (!imageUrl) return;
 
     try {
-      const filename = path.basename(imageUrl);
-      const filepath = path.join(this.uploadDir, filename);
-      await fs.unlink(filepath);
+      await this.supabaseService.deleteFile(imageUrl);
     } catch (error) {
       console.warn('Failed to delete image:', error.message);
-      // Don't throw error if file doesn't exist
+      // Don't throw error if deletion fails
     }
   }
 }
